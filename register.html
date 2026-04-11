@@ -541,7 +541,7 @@
     const agree = document.getElementById('p_agree').checked;
     const errEl = document.getElementById('step3-error');
 
-    if (!pf)         { showErr(errEl, 'Please enter the parent or guardian's name.'); return; }
+    if (!pf)         { showErr(errEl, 'Please enter the parent or guardian name.'); return; }
     if (!pe || !pe.includes('@')) { showErr(errEl, 'Please enter a valid parent email address.'); return; }
     if (!agree)      { showErr(errEl, 'Please confirm that you are the parent or guardian.'); return; }
 
