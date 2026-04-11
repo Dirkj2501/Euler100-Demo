@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>STELLA AI Tutor — Stage 1: Explorer</title>
+  <title>STELLA AI Tutor — Euler100</title>
   <link rel="stylesheet" href="styles.css">
   <style>
     body { background: var(--bg); overflow: hidden; }
@@ -240,20 +240,6 @@
     .send-btn:disabled { background: var(--border); cursor: not-allowed; }
     .send-btn svg { width:18px;height:18px;fill:#fff; }
 
-    /* Celebration */
-    .celebration-banner {
-      display: none;
-      background: linear-gradient(135deg,#1a0808,#3A1A00);
-      border-radius: var(--r-lg);
-      padding: 1.5rem;
-      text-align: center;
-      color: var(--white);
-      animation: popIn 0.4s ease;
-    }
-    @keyframes popIn { from{transform:scale(0.9);opacity:0} to{transform:scale(1);opacity:1} }
-    .celebration-banner h3 { color:var(--gold); font-size:1.3rem; margin-bottom:0.5rem; }
-    .celebration-banner p  { color:rgba(255,255,255,0.75); font-size:0.875rem; margin-bottom:1.25rem; }
-
     /* Score badge */
     .score-big {
       font-family: var(--serif);
@@ -264,6 +250,30 @@
       margin-bottom: 0.25rem;
     }
     .score-label { font-size:0.8rem; color:rgba(255,255,255,0.5); }
+
+    /* Coming soon panel */
+    .coming-soon-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      gap: 1rem;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .coming-soon-panel .cs-icon { font-size: 3.5rem; }
+    .coming-soon-panel h2 { font-family: var(--serif); font-size: 1.6rem; color: var(--charcoal); }
+    .coming-soon-panel p { color: var(--charcoal-2); max-width: 420px; line-height: 1.7; }
+    .stage-badge-large {
+      background: linear-gradient(135deg, #1a0808, #3A1A00);
+      color: var(--gold);
+      font-family: var(--serif);
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 0.5rem 1.25rem;
+      border-radius: 30px;
+    }
   </style>
 </head>
 <body>
@@ -276,7 +286,7 @@
       <li><a href="dashboard.html">← Dashboard</a></li>
     </ul>
     <div class="nav-actions">
-      <span id="nav-user" style="font-size:0.85rem;font-weight:600;color:var(--charcoal-2);">Stage 1: Explorer</span>
+      <span id="nav-user" style="font-size:0.85rem;font-weight:600;color:var(--charcoal-2);">Loading…</span>
     </div>
   </div>
 </nav>
@@ -287,31 +297,23 @@
   <div class="tutor-panel">
     <div class="stage-info-card">
       <div class="si-eyebrow">Euler100 · STELLA AI Tutor</div>
-      <div class="si-title">🧭 Stage 1: Explorer</div>
-      <div class="si-sub">Grade 7 Mathematics · 5 Questions</div>
+      <div class="si-title" id="panel-stage-title">Loading…</div>
+      <div class="si-sub" id="panel-stage-sub">Loading…</div>
     </div>
 
-    <div class="q-tracker">
+    <div class="q-tracker" id="q-tracker-wrap">
       <div class="qt-title">Question Progress</div>
       <div class="qt-list" id="q-tracker-list">
         <!-- filled by JS -->
       </div>
     </div>
 
-    <div>
-      <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--charcoal-2);margin-bottom:0.5rem;">Topics in Stage 1</div>
-      <div style="display:flex;flex-wrap:wrap;gap:0.4rem;">
-        <span class="topic-tag">📐 Algebra</span>
-        <span class="topic-tag">📏 Geometry</span>
-        <span class="topic-tag">🔢 Fractions</span>
-        <span class="topic-tag">📊 Percentages</span>
-        <span class="topic-tag">🚂 Speed & Distance</span>
-      </div>
+    <div id="panel-topics">
+      <!-- filled by JS -->
     </div>
 
-    <div class="rules-card">
-      <strong>Stage Rules</strong>
-      Answer at least <strong>4 out of 5</strong> questions correctly to pass Stage 1 and advance to Discoverer. You get <strong>2 attempts</strong> per question before STELLA reveals the answer.
+    <div class="rules-card" id="panel-rules">
+      <!-- filled by JS -->
     </div>
 
     <div>
@@ -319,21 +321,30 @@
     </div>
   </div>
 
-  <!-- Chat -->
-  <div class="tutor-chat">
+  <!-- Chat / Coming Soon -->
+  <div class="tutor-chat" id="tutor-chat-area">
     <div class="chat-header">
       <div class="stella-avatar">S</div>
       <div class="chat-header-info">
         <strong>STELLA AI Tutor</strong>
-        <span><span class="online-dot"></span>Active · Stage 1: Explorer · Powered by Claude</span>
+        <span id="chat-header-sub"><span class="online-dot"></span>Active · Powered by Claude</span>
       </div>
     </div>
 
-    <div class="chat-messages" id="chat-messages">
-      <!-- messages injected by JS -->
+    <!-- Chat messages (shown for stages 1 & 2) -->
+    <div class="chat-messages" id="chat-messages" style="display:none;"></div>
+
+    <!-- Coming soon panel (shown for stage 3+) -->
+    <div class="coming-soon-panel" id="coming-soon" style="display:none;">
+      <div class="cs-icon" id="cs-icon">🗺️</div>
+      <div class="stage-badge-large" id="cs-badge">Stage 3: Pathfinder</div>
+      <h2>Coming Soon!</h2>
+      <p id="cs-text">You've completed Stage 2: Discoverer — amazing progress! Stage 3: Pathfinder questions are being prepared by the Euler100 team and will be available soon.</p>
+      <a href="dashboard.html" class="btn btn-gold" style="margin-top:0.5rem;">Back to Dashboard →</a>
     </div>
 
-    <div class="chat-input-wrap">
+    <!-- Input bar (hidden for coming-soon) -->
+    <div class="chat-input-wrap" id="chat-input-wrap">
       <textarea
         class="chat-input"
         id="chat-input"
@@ -351,381 +362,488 @@
 
 <script>
 /* =====================================================
-   STELLA AI Tutor — Stage 1: Explorer
-   5 Grade 7 mathematics questions with 2-attempt system
+   STELLA AI Tutor — Stage-aware (Euler100)
+   Supports Stage 1 (Explorer) and Stage 2 (Discoverer)
+   Shows "coming soon" for Stage 3+
    ===================================================== */
 
-const alias = localStorage.getItem('e100_alias') || 'MathWizard42';
-document.getElementById('nav-user').textContent = alias + ' · Stage 1: Explorer';
+// ── Stage definitions ──────────────────────────────────
+const STAGES = {
+  1: {
+    num: 1,
+    name: 'Explorer',
+    emoji: '🧭',
+    grade: 'Grade 7 Mathematics · 5 Questions',
+    nextNum: 2,
+    nextName: 'Discoverer',
+    nextEmoji: '🔍',
+    storeKey: 'e100_stage1_done',
+    scoreKey: 'e100_stage1_score',
+    topics: ['📐 Algebra', '📏 Geometry', '🔢 Fractions', '📊 Percentages', '🚂 Speed & Distance'],
+    topicLabels: [
+      'Algebra — solving equations',
+      'Geometry — perimeter',
+      'Fractions — addition',
+      'Percentages — percentage of a number',
+      'Speed, distance & time',
+    ],
+    questions: [
+      {
+        id: 1,
+        topic: 'Algebra',
+        question: 'If 3x + 7 = 22, what is the value of x?',
+        answers: ['5', 'x=5', 'x = 5', 'five'],
+        answer: '5',
+        hint: 'Hint: Start by subtracting 7 from both sides. What does 3x equal now?',
+        explanation: 'Solution: 3x + 7 = 22 → 3x = 15 → x = 5.',
+      },
+      {
+        id: 2,
+        topic: 'Geometry',
+        question: 'A rectangle has a length of 12 cm and a width of 7 cm. What is its perimeter in cm?',
+        answers: ['38', '38 cm', '38cm'],
+        answer: '38 cm',
+        hint: 'Hint: Perimeter = 2 × (length + width). Try adding the length and width first, then double it.',
+        explanation: 'Perimeter = 2 × (12 + 7) = 2 × 19 = 38 cm.',
+      },
+      {
+        id: 3,
+        topic: 'Fractions',
+        question: 'What is 2/5 + 3/10? Write your answer as a simplified fraction.',
+        answers: ['7/10', '0.7', '.7'],
+        answer: '7/10',
+        hint: 'Hint: To add fractions you need a common denominator. Convert 2/5 into tenths first.',
+        explanation: '2/5 = 4/10. So 4/10 + 3/10 = 7/10.',
+      },
+      {
+        id: 4,
+        topic: 'Percentages',
+        question: 'What is 15% of 80?',
+        answers: ['12', '12.0', '12.00'],
+        answer: '12',
+        hint: 'Hint: Find 10% of 80 first (= 8), then find 5% (half of 10%), and add them.',
+        explanation: '10% of 80 = 8. 5% of 80 = 4. So 15% = 8 + 4 = 12.',
+      },
+      {
+        id: 5,
+        topic: 'Speed & Distance',
+        question: 'A train travels 240 km in 3 hours. What is its average speed in km/h?',
+        answers: ['80', '80 km/h', '80km/h', '80 kmh'],
+        answer: '80 km/h',
+        hint: 'Hint: Speed = Distance ÷ Time. Divide the total distance by the number of hours.',
+        explanation: 'Speed = 240 ÷ 3 = 80 km/h.',
+      },
+    ],
+  },
 
-// Question definitions
-const questions = [
-  {
-    id: 1,
-    topic: 'Algebra',
-    question: 'If 3x + 7 = 22, what is the value of x?',
-    answers: ['5', 'x=5', 'x = 5', 'five'],
-    answer: '5',
-    hint: '💡 Hint: Start by subtracting 7 from both sides of the equation. What does 3x equal now?',
-    explanation: 'Here\'s the solution: 3x + 7 = 22 → 3x = 15 → x = 5.',
+  2: {
+    num: 2,
+    name: 'Discoverer',
+    emoji: '🔍',
+    grade: 'Grade 7–8 Mathematics · 5 Questions',
+    nextNum: 3,
+    nextName: 'Pathfinder',
+    nextEmoji: '🗺️',
+    storeKey: 'e100_stage2_done',
+    scoreKey: 'e100_stage2_score',
+    topics: ['🔢 HCF & LCM', '📐 Algebra', '⭕ Circles', '🎲 Probability', '⚖️ Ratio'],
+    topicLabels: [
+      'Number theory — HCF & LCM',
+      'Algebra — expanding brackets',
+      'Geometry — circle area',
+      'Probability — simple events',
+      'Ratio & proportion',
+    ],
+    questions: [
+      {
+        id: 1,
+        topic: 'HCF & LCM',
+        question: 'What is the Highest Common Factor (HCF) of 36 and 48?',
+        answers: ['12'],
+        answer: '12',
+        hint: 'Hint: List the factors of each number and find the largest one they share. Factors of 36: 1, 2, 3, 4, 6, 9, 12…',
+        explanation: 'Factors of 36: 1,2,3,4,6,9,12,18,36. Factors of 48: 1,2,3,4,6,8,12,16,24,48. The HCF = 12.',
+      },
+      {
+        id: 2,
+        topic: 'Algebra',
+        question: 'Expand and simplify: 3(2x + 4) − 2(x − 1)',
+        answers: ['4x+14', '4x + 14'],
+        answer: '4x + 14',
+        hint: 'Hint: Multiply out each bracket separately, then collect like terms. Watch the signs when expanding −2(x − 1).',
+        explanation: '3(2x+4) = 6x+12 and −2(x−1) = −2x+2. Combined: 6x−2x + 12+2 = 4x + 14.',
+      },
+      {
+        id: 3,
+        topic: 'Circles',
+        question: 'A circle has a radius of 7 cm. What is its area? (Use π = 22/7, give your answer in cm²)',
+        answers: ['154', '154 cm2', '154cm2', '154 cm²', '154cm²'],
+        answer: '154 cm²',
+        hint: 'Hint: Area of a circle = π × r². Square the radius first (7² = 49), then multiply by 22/7.',
+        explanation: 'Area = (22/7) × 7² = (22/7) × 49 = 22 × 7 = 154 cm².',
+      },
+      {
+        id: 4,
+        topic: 'Probability',
+        question: 'A bag contains 5 red marbles and 3 blue marbles. If you pick one at random, what is the probability of picking red? Write as a fraction.',
+        answers: ['5/8'],
+        answer: '5/8',
+        hint: 'Hint: Probability = favourable outcomes ÷ total outcomes. How many marbles are there altogether?',
+        explanation: 'Total = 5 + 3 = 8. P(red) = 5/8.',
+      },
+      {
+        id: 5,
+        topic: 'Ratio',
+        question: 'Divide 120 in the ratio 3:5. What is the larger share?',
+        answers: ['75'],
+        answer: '75',
+        hint: 'Hint: Add the ratio parts (3+5=8). Find one part (120÷8=15). Multiply by 5 for the larger share.',
+        explanation: 'Total parts = 8. One part = 120÷8 = 15. Larger share = 5 × 15 = 75.',
+      },
+    ],
   },
-  {
-    id: 2,
-    topic: 'Geometry',
-    question: 'A rectangle has a length of 12 cm and a width of 7 cm. What is its perimeter in cm?',
-    answers: ['38', '38 cm', '38cm'],
-    answer: '38 cm',
-    hint: '💡 Hint: Perimeter = 2 × (length + width). Try adding the length and width first, then double it.',
-    explanation: 'Perimeter = 2 × (12 + 7) = 2 × 19 = 38 cm.',
-  },
-  {
-    id: 3,
-    topic: 'Fractions',
-    question: 'What is 2/5 + 3/10? Write your answer as a simplified fraction.',
-    answers: ['7/10', '0.7', '.7'],
-    answer: '7/10',
-    hint: '💡 Hint: To add fractions, you need a common denominator. Convert 2/5 into tenths first.',
-    explanation: '2/5 = 4/10. So 4/10 + 3/10 = 7/10.',
-  },
-  {
-    id: 4,
-    topic: 'Percentages',
-    question: 'What is 15% of 80?',
-    answers: ['12', '12.0', '12.00'],
-    answer: '12',
-    hint: '💡 Hint: You can find 10% of 80 first (= 8), then find 5% (half of 10%), and add them together.',
-    explanation: '10% of 80 = 8. 5% of 80 = 4. So 15% = 8 + 4 = 12.',
-  },
-  {
-    id: 5,
-    topic: 'Speed & Distance',
-    question: 'A train travels 240 km in 3 hours. What is its average speed in km/h?',
-    answers: ['80', '80 km/h', '80km/h', '80 kmh'],
-    answer: '80 km/h',
-    hint: '💡 Hint: Speed = Distance ÷ Time. Divide the total distance by the number of hours.',
-    explanation: 'Speed = 240 ÷ 3 = 80 km/h.',
-  },
-];
-
-const qTopics = [
-  'Algebra — solving equations',
-  'Geometry — perimeter',
-  'Fractions — addition',
-  'Percentages — percentage of a number',
-  'Speed, distance & time',
-];
-
-// State
-let state = {
-  phase: 'welcome',     // 'welcome' | 'q1..q5' | 'done'
-  qIndex: 0,
-  attempts: 0,
-  scores: [],           // 'correct' | 'wrong' per question
-  correctCount: 0,
-  waitingForStart: true,
 };
 
-const msgContainer = document.getElementById('chat-messages');
-const inputEl      = document.getElementById('chat-input');
-const sendEl       = document.getElementById('send-btn');
+// ── Read state from localStorage ─────────────────────
+const alias        = localStorage.getItem('e100_alias') || 'MathWizard42';
+const currentStage = parseInt(localStorage.getItem('e100_stage') || '1', 10);
+const sd           = STAGES[currentStage]; // may be undefined for stage 3+
 
-function enableInput(placeholder) {
-  inputEl.disabled = false;
-  sendEl.disabled  = false;
-  inputEl.placeholder = placeholder || 'Type your answer…';
-  inputEl.focus();
+// ── Populate left panel ───────────────────────────────
+const stageName  = sd ? sd.name  : (['','','','Pathfinder','Scholar','Cum Laude','Summa Cum Laude','Genius'][currentStage] || 'Advanced');
+const stageEmoji = sd ? sd.emoji : '🗺️';
+
+document.getElementById('nav-user').textContent = alias + ' · Stage ' + currentStage + ': ' + stageName;
+document.getElementById('panel-stage-title').textContent = stageEmoji + ' Stage ' + currentStage + ': ' + stageName;
+document.getElementById('panel-stage-sub').textContent   = sd ? sd.grade : 'Advanced Mathematics';
+
+if (sd) {
+  // Topics
+  document.getElementById('panel-topics').innerHTML = `
+    <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--charcoal-2);margin-bottom:0.5rem;">Topics in Stage ${sd.num}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:0.4rem;">
+      ${sd.topics.map(t => `<span class="topic-tag">${t}</span>`).join('')}
+    </div>
+  `;
+  // Rules
+  document.getElementById('panel-rules').innerHTML = `
+    <strong>Stage Rules</strong>
+    Answer at least <strong>4 out of 5</strong> questions correctly to pass Stage ${sd.num} and advance to ${sd.nextEmoji} ${sd.nextName}.
+    You get <strong>2 attempts</strong> per question before STELLA reveals the answer.
+  `;
+} else {
+  document.getElementById('panel-topics').style.display = 'none';
+  document.getElementById('panel-rules').style.display  = 'none';
+  document.getElementById('q-tracker-wrap').style.display = 'none';
 }
 
-function disableInput() {
-  inputEl.disabled = true;
-  sendEl.disabled  = true;
-}
+// ── Show correct UI area ──────────────────────────────
+if (!sd) {
+  // Stage 3+ — show coming soon
+  document.getElementById('chat-messages').style.display    = 'none';
+  document.getElementById('chat-input-wrap').style.display  = 'none';
+  document.getElementById('coming-soon').style.display      = 'flex';
+  document.getElementById('chat-header-sub').innerHTML = '<span style="color:var(--charcoal-2);">Stage ' + currentStage + ': ' + stageName + ' — Coming Soon</span>';
 
-function addMsg(role, html, delay=0) {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      const wrap = document.createElement('div');
-      wrap.className = 'msg ' + role;
+  const prevStage = currentStage - 1;
+  const prevName  = ['','Explorer','Discoverer','Pathfinder','Scholar','Cum Laude','Summa Cum Laude'][prevStage] || 'previous stage';
+  document.getElementById('cs-icon').textContent  = stageEmoji;
+  document.getElementById('cs-badge').textContent = 'Stage ' + currentStage + ': ' + stageName;
+  document.getElementById('cs-text').textContent  =
+    'You have completed Stage ' + prevStage + ': ' + prevName + ' — amazing progress! ' +
+    'Stage ' + currentStage + ': ' + stageName + ' questions are being prepared by the Euler100 team and will be available soon.';
 
-      const av = document.createElement('div');
+} else {
+  // Stages 1 or 2 — show chat
+  document.getElementById('chat-messages').style.display    = 'flex';
+  document.getElementById('chat-input-wrap').style.display  = 'flex';
+  document.getElementById('coming-soon').style.display      = 'none';
+  document.getElementById('chat-header-sub').innerHTML =
+    '<span class="online-dot"></span>Active · Stage ' + sd.num + ': ' + sd.name + ' · Powered by Claude';
+
+  // ── Question-set & state ────────────────────────────
+  const questions  = sd.questions;
+  const qTopics    = sd.topicLabels;
+
+  let state = {
+    phase:       'welcome',
+    qIndex:      0,
+    attempts:    0,
+    scores:      [],
+    correctCount: 0,
+  };
+
+  const msgContainer = document.getElementById('chat-messages');
+  const inputEl      = document.getElementById('chat-input');
+  const sendEl       = document.getElementById('send-btn');
+
+  function enableInput(placeholder) {
+    inputEl.disabled = false;
+    sendEl.disabled  = false;
+    inputEl.placeholder = placeholder || 'Type your answer…';
+    inputEl.focus();
+  }
+
+  function disableInput() {
+    inputEl.disabled = true;
+    sendEl.disabled  = true;
+  }
+
+  function addMsg(role, html, delay) {
+    delay = delay || 0;
+    return new Promise(function(resolve) {
+      setTimeout(function() {
+        var wrap = document.createElement('div');
+        wrap.className = 'msg ' + role;
+
+        var av = document.createElement('div');
+        av.className = 'msg-av';
+        av.textContent = role === 'stella' ? '🤖' : '🧑‍🎓';
+
+        var bub = document.createElement('div');
+        bub.className = 'msg-bub';
+        bub.innerHTML = html;
+
+        wrap.appendChild(av);
+        wrap.appendChild(bub);
+        msgContainer.appendChild(wrap);
+        scrollBottom();
+        resolve();
+      }, delay);
+    });
+  }
+
+  function showTyping(duration) {
+    duration = duration || 1200;
+    return new Promise(function(resolve) {
+      var wrap = document.createElement('div');
+      wrap.className = 'msg stella';
+      wrap.id = 'typing-indicator';
+
+      var av = document.createElement('div');
       av.className = 'msg-av';
-      av.textContent = role === 'stella' ? '🤖' : '🧭';
+      av.textContent = '🤖';
 
-      const bub = document.createElement('div');
-      bub.className = 'msg-bub';
-      bub.innerHTML = html;
+      var bub = document.createElement('div');
+      bub.className = 'typing-bub';
+      bub.innerHTML = '<div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div>';
 
       wrap.appendChild(av);
       wrap.appendChild(bub);
       msgContainer.appendChild(wrap);
       scrollBottom();
-      resolve();
-    }, delay);
-  });
-}
 
-function showTyping(duration=1200) {
-  return new Promise(resolve => {
-    const wrap = document.createElement('div');
-    wrap.className = 'msg stella';
-    wrap.id = 'typing-indicator';
+      setTimeout(function() {
+        var ind = document.getElementById('typing-indicator');
+        if (ind) ind.remove();
+        resolve();
+      }, duration);
+    });
+  }
 
-    const av = document.createElement('div');
-    av.className = 'msg-av';
-    av.textContent = '🤖';
+  function scrollBottom() {
+    msgContainer.scrollTop = msgContainer.scrollHeight;
+  }
 
-    const bub = document.createElement('div');
-    bub.className = 'typing-bub';
-    bub.innerHTML = '<div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div>';
+  function updateQTracker() {
+    var list = document.getElementById('q-tracker-list');
+    list.innerHTML = '';
+    questions.forEach(function(q, i) {
+      var status = state.scores[i];
+      var cls = '';
+      if (i === state.qIndex && state.phase !== 'done') cls = 'active';
+      else if (status === 'correct') cls = 'correct';
+      else if (status === 'wrong')   cls = 'wrong';
 
-    wrap.appendChild(av);
-    wrap.appendChild(bub);
-    msgContainer.appendChild(wrap);
-    scrollBottom();
+      var icon = status === 'correct' ? '✓' : status === 'wrong' ? '✗' : (i === state.qIndex ? '▶' : '—');
+      list.innerHTML += '<div class="qt-item ' + cls + '"><div class="qt-num">' + icon + '</div><span>Q' + (i+1) + ': ' + qTopics[i] + '</span></div>';
+    });
+  }
 
-    setTimeout(() => {
-      const ind = document.getElementById('typing-indicator');
-      if (ind) ind.remove();
-      resolve();
-    }, duration);
-  });
-}
+  async function startConversation() {
+    disableInput();
+    await showTyping(1500);
+    await addMsg('stella',
+      'Hello, <strong>' + alias + '</strong>! 👋 I\'m STELLA, your AI mathematics tutor for <strong>Euler100</strong>.<br><br>' +
+      'Welcome to <strong>Stage ' + sd.num + ': ' + sd.emoji + ' ' + sd.name + '</strong>!<br><br>' +
+      'Today\'s session has <strong>5 maths questions</strong> covering ' + sd.topics.map(function(t){ return t.replace(/^[^\s]+\s/,''); }).join(', ') + '.<br>' +
+      'Answer at least <strong>4 out of 5 correctly</strong> to advance to Stage ' + sd.nextNum + ': ' + sd.nextEmoji + ' ' + sd.nextName + '!<br><br>' +
+      'You get <strong>2 attempts</strong> per question, and I\'ll give you a hint if you need one. Ready to begin? 🚀'
+    );
+    enableInput('Type "yes" or "ready" to start…');
+    state.phase = 'welcome';
+  }
 
-function scrollBottom() {
-  msgContainer.scrollTop = msgContainer.scrollHeight;
-}
-
-function updateQTracker() {
-  const list = document.getElementById('q-tracker-list');
-  list.innerHTML = '';
-  questions.forEach((q, i) => {
-    const status = state.scores[i];
-    let cls = '';
-    if (i === state.qIndex && state.phase !== 'done') cls = 'active';
-    else if (status === 'correct') cls = 'correct';
-    else if (status === 'wrong')   cls = 'wrong';
-
-    const icon = status === 'correct' ? '✓' : status === 'wrong' ? '✗' : (i === state.qIndex ? '▶' : '—');
-    list.innerHTML += `
-      <div class="qt-item ${cls}">
-        <div class="qt-num">${icon}</div>
-        <span>Q${i+1}: ${qTopics[i]}</span>
-      </div>
-    `;
-  });
-}
-
-async function startConversation() {
-  disableInput();
-
-  await showTyping(1500);
-  await addMsg('stella', `
-    Hello, <strong>${alias}</strong>! 👋 I'm STELLA, your AI mathematics tutor for <strong>Euler100</strong>.<br><br>
-    Welcome to <strong>Stage 1: Explorer</strong> 🧭<br><br>
-    Today's session has <strong>5 Grade 7 maths questions</strong> covering algebra, geometry, fractions, percentages, and speed.
-    Answer at least <strong>4 out of 5 correctly</strong> and you'll advance to Stage 2: Discoverer!<br><br>
-    You get <strong>2 attempts</strong> at each question, and I'll give you a hint if you need one. Ready to begin? 🚀
-  `);
-
-  enableInput('Type "yes" or "ready" to start…');
-  state.phase = 'welcome';
-}
-
-async function handleWelcome() {
-  disableInput();
-  const userText = inputEl.value.trim();
-  if (!userText) { enableInput('Type "yes" or "ready" to start…'); return; }
-  await addMsg('user', userText);
-  inputEl.value = '';
-
-  state.phase = 'question';
-  state.qIndex = 0;
-  state.attempts = 0;
-  updateQTracker();
-  await askQuestion(0);
-}
-
-async function askQuestion(idx) {
-  const q = questions[idx];
-  disableInput();
-
-  await showTyping(1000);
-  await addMsg('stella', `
-    <strong>Question ${idx+1} of 5</strong> &nbsp;·&nbsp; <span style="color:var(--stella-dark);font-size:0.82rem;">${q.topic}</span>
-    <div class="q-block">${q.question}</div>
-  `);
-  state.attempts = 0;
-  enableInput('Type your answer and press Enter or click Send…');
-}
-
-async function handleAnswer() {
-  const raw   = inputEl.value.trim();
-  if (!raw) return;
-  const lower = raw.toLowerCase().replace(/\s+/g,'').replace(/[^0-9a-z/\.]/g,'');
-
-  disableInput();
-  await addMsg('user', raw);
-  inputEl.value = '';
-
-  const q = questions[state.qIndex];
-  const correct = q.answers.some(a => {
-    const norm = a.toLowerCase().replace(/\s+/g,'').replace(/[^0-9a-z/\.]/g,'');
-    return lower === norm || lower.replace('cm','') === norm.replace('cm','') || lower.replace('km/h','') === norm.replace('km/h','') || lower.replace('kmh','') === norm.replace('kmh','');
-  });
-
-  if (correct) {
-    // Correct answer
-    state.scores[state.qIndex] = 'correct';
-    state.correctCount++;
+  async function handleWelcome() {
+    disableInput();
+    var userText = inputEl.value.trim();
+    if (!userText) { enableInput('Type "yes" or "ready" to start…'); return; }
+    await addMsg('user', userText);
+    inputEl.value = '';
+    state.phase  = 'question';
+    state.qIndex = 0;
+    state.attempts = 0;
     updateQTracker();
+    await askQuestion(0);
+  }
 
-    await showTyping(900);
-    const encouragements = [
-      '✅ <div class="result-correct">Correct! Excellent work!</div>',
-      '✅ <div class="result-correct">That\'s right! Well done!</div>',
-      '✅ <div class="result-correct">Perfect! Great reasoning!</div>',
-      '✅ <div class="result-correct">Spot on! You got it!</div>',
-      '✅ <div class="result-correct">Brilliant! Exactly right!</div>',
-    ];
-    let feedbackHtml = encouragements[state.qIndex] + `<br>${q.explanation}`;
+  async function askQuestion(idx) {
+    var q = questions[idx];
+    disableInput();
+    await showTyping(1000);
+    await addMsg('stella',
+      '<strong>Question ' + (idx+1) + ' of 5</strong> &nbsp;·&nbsp; <span style="color:var(--stella-dark);font-size:0.82rem;">' + q.topic + '</span>' +
+      '<div class="q-block">' + q.question + '</div>'
+    );
+    state.attempts = 0;
+    enableInput('Type your answer and press Enter or click Send…');
+  }
 
-    if (state.qIndex < 4) {
-      feedbackHtml += '<br>Let\'s keep going. Ready for the next one?';
-    }
-    await addMsg('stella', feedbackHtml);
+  async function handleAnswer() {
+    var raw   = inputEl.value.trim();
+    if (!raw) return;
+    var lower = raw.toLowerCase().replace(/\s+/g,'').replace(/[^0-9a-z/\.+\-]/g,'');
 
-    await advance();
+    disableInput();
+    await addMsg('user', raw);
+    inputEl.value = '';
 
-  } else {
-    state.attempts++;
+    var q = questions[state.qIndex];
+    var correct = q.answers.some(function(a) {
+      var norm = a.toLowerCase().replace(/\s+/g,'').replace(/[^0-9a-z/\.+\-]/g,'');
+      return lower === norm ||
+        lower.replace('cm','')   === norm.replace('cm','') ||
+        lower.replace('cm2','')  === norm.replace('cm2','') ||
+        lower.replace('km/h','') === norm.replace('km/h','') ||
+        lower.replace('kmh','')  === norm.replace('kmh','');
+    });
 
-    if (state.attempts === 1) {
-      // First wrong — give a hint
-      await showTyping(800);
-      await addMsg('stella', `Not quite — but you're on the right track!<br><div class="hint-block">${q.hint}</div><br>Have another go. What's your answer?`);
-      enableInput('Try again…');
-    } else {
-      // Second wrong — reveal answer
-      state.scores[state.qIndex] = 'wrong';
+    if (correct) {
+      state.scores[state.qIndex] = 'correct';
+      state.correctCount++;
       updateQTracker();
 
       await showTyping(900);
-      await addMsg('stella', `
-        Not to worry — this one is tricky!<br>
-        <div class="result-wrong">The correct answer is <strong>${q.answer}</strong>.</div>
-        <br>${q.explanation}<br>Make a note of this — it may come up in your practice!
-      `);
-
+      var encouragements = [
+        '✅ <div class="result-correct">Correct! Excellent work!</div>',
+        '✅ <div class="result-correct">That\'s right! Well done!</div>',
+        '✅ <div class="result-correct">Perfect! Great reasoning!</div>',
+        '✅ <div class="result-correct">Spot on! You got it!</div>',
+        '✅ <div class="result-correct">Brilliant! Exactly right!</div>',
+      ];
+      var feedbackHtml = encouragements[state.qIndex] + '<br>' + q.explanation;
+      if (state.qIndex < 4) feedbackHtml += '<br>Let\'s keep going — ready for the next one?';
+      await addMsg('stella', feedbackHtml);
       await advance();
+
+    } else {
+      state.attempts++;
+      if (state.attempts === 1) {
+        await showTyping(800);
+        await addMsg('stella', 'Not quite — but you\'re on the right track!<br><div class="hint-block">💡 ' + q.hint + '</div><br>Have another go. What\'s your answer?');
+        enableInput('Try again…');
+      } else {
+        state.scores[state.qIndex] = 'wrong';
+        updateQTracker();
+        await showTyping(900);
+        await addMsg('stella',
+          'Not to worry — this one is tricky!<br>' +
+          '<div class="result-wrong">The correct answer is <strong>' + q.answer + '</strong>.</div>' +
+          '<br>' + q.explanation + '<br>Make a note of this — it may come up in your practice!'
+        );
+        await advance();
+      }
     }
   }
-}
 
-async function advance() {
-  if (state.qIndex < 4) {
-    state.qIndex++;
-    state.attempts = 0;
-    await new Promise(r => setTimeout(r, 600));
-    await askQuestion(state.qIndex);
-  } else {
-    // All done
-    state.phase = 'done';
-    updateQTracker();
-    await showResults();
+  async function advance() {
+    if (state.qIndex < 4) {
+      state.qIndex++;
+      state.attempts = 0;
+      await new Promise(function(r){ setTimeout(r, 600); });
+      await askQuestion(state.qIndex);
+    } else {
+      state.phase = 'done';
+      updateQTracker();
+      await showResults();
+    }
   }
-}
 
-async function showResults() {
-  const score = state.correctCount;
-  const pass  = score >= 4;
+  async function showResults() {
+    var score = state.correctCount;
+    var pass  = score >= 4;
 
-  disableInput();
-  inputEl.placeholder = 'Session complete';
+    disableInput();
+    inputEl.placeholder = 'Session complete';
 
-  await showTyping(1500);
-  await addMsg('stella', `
-    🎯 All 5 questions complete! Let me tally your results…
-  `);
+    await showTyping(1500);
+    await addMsg('stella', '🎯 All 5 questions complete! Let me tally your results…');
+    await new Promise(function(r){ setTimeout(r, 1200); });
 
-  await new Promise(r => setTimeout(r, 1200));
+    if (pass) {
+      localStorage.setItem(sd.storeKey, 'yes');
+      localStorage.setItem(sd.scoreKey, String(score));
+      localStorage.setItem('e100_stage', String(sd.nextNum));
 
-  if (pass) {
-    // Save results
-    localStorage.setItem('e100_stage1_done', 'yes');
-    localStorage.setItem('e100_stage1_score', String(score));
-    localStorage.setItem('e100_stage', '2');
-
-    await addMsg('stella', `
-      <span style="font-size:1.5rem;display:block;margin-bottom:0.5rem;">🎉 Congratulations, <strong>${alias}</strong>!</span>
-      <div class="result-correct" style="font-size:1rem;padding:0.75rem 1rem;">
-        You scored <strong>${score} out of 5</strong> — you've passed Stage 1: Explorer!
-      </div>
-      <br>
-      You've earned the right to advance to <strong>Stage 2: Discoverer</strong> 🔍<br><br>
-      Here's your Stage 1 summary:<br>
-      ${questions.map((q,i) => `<div style="font-size:0.8rem;margin-top:0.25rem;">${state.scores[i]==='correct'?'✅':'❌'} Q${i+1}: ${q.topic}</div>`).join('')}
-      <br>
-      Head to your dashboard to see Stage 2 unlocked and continue your journey to Genius! 🏔
-      <br><br>
-      <a href="dashboard.html" class="btn btn-gold" style="margin-top:0.25rem;">View My Dashboard →</a>
-    `);
-  } else {
-    await addMsg('stella', `
-      You scored <strong>${score} out of 5</strong> — you need at least 4 to advance.
-      <br><br>
-      Don't worry at all — let's look at where we can improve:
-      <br>
-      ${questions.map((q,i) => `<div style="font-size:0.8rem;margin-top:0.25rem;">${state.scores[i]==='correct'?'✅':'❌'} Q${i+1}: ${q.topic}</div>`).join('')}
-      <br>
-      I'd recommend reviewing ${questions.filter((_,i)=>state.scores[i]==='wrong').map(q=>q.topic).join(' and ')} before retrying.
-      I can help you practise right now if you'd like!
-      <br><br>
-      <a href="dashboard.html" class="btn btn-outline" style="margin-top:0.25rem;">Back to Dashboard</a>
-      &nbsp; <button onclick="retryStage()" class="btn btn-stella" style="margin-top:0.25rem;">Try Stage 1 Again</button>
-    `);
+      await addMsg('stella',
+        '<span style="font-size:1.5rem;display:block;margin-bottom:0.5rem;">🎉 Congratulations, <strong>' + alias + '</strong>!</span>' +
+        '<div class="result-correct" style="font-size:1rem;padding:0.75rem 1rem;">' +
+          'You scored <strong>' + score + ' out of 5</strong> — you\'ve passed Stage ' + sd.num + ': ' + sd.name + '!' +
+        '</div>' +
+        '<br>You\'ve earned the right to advance to <strong>Stage ' + sd.nextNum + ': ' + sd.nextEmoji + ' ' + sd.nextName + '</strong>!<br><br>' +
+        'Here\'s your Stage ' + sd.num + ' summary:<br>' +
+        questions.map(function(q,i){ return '<div style="font-size:0.8rem;margin-top:0.25rem;">' + (state.scores[i]==='correct'?'✅':'❌') + ' Q' + (i+1) + ': ' + q.topic + '</div>'; }).join('') +
+        '<br>Head to your dashboard to continue your journey! 🏔<br><br>' +
+        '<a href="dashboard.html" class="btn btn-gold" style="margin-top:0.25rem;">View My Dashboard →</a>'
+      );
+    } else {
+      await addMsg('stella',
+        'You scored <strong>' + score + ' out of 5</strong> — you need at least 4 to advance.<br><br>' +
+        'Don\'t worry at all — let\'s look at where we can improve:<br>' +
+        questions.map(function(q,i){ return '<div style="font-size:0.8rem;margin-top:0.25rem;">' + (state.scores[i]==='correct'?'✅':'❌') + ' Q' + (i+1) + ': ' + q.topic + '</div>'; }).join('') +
+        '<br>I\'d recommend reviewing <em>' + questions.filter(function(_,i){ return state.scores[i]==='wrong'; }).map(function(q){ return q.topic; }).join(' and ') + '</em> before retrying.<br><br>' +
+        '<a href="dashboard.html" class="btn btn-outline" style="margin-top:0.25rem;">Back to Dashboard</a>' +
+        ' &nbsp; <button onclick="retryStage()" class="btn btn-stella" style="margin-top:0.25rem;">Try Stage ' + sd.num + ' Again</button>'
+      );
+    }
+    scrollBottom();
   }
-  scrollBottom();
-}
 
-function retryStage() {
-  state = { phase:'question', qIndex:0, attempts:0, scores:[], correctCount:0, waitingForStart:false };
-  localStorage.removeItem('e100_stage1_done');
-  localStorage.setItem('e100_stage', '1');
-  addMsg('stella', 'Let\'s go again! Starting from Question 1…').then(() => {
-    updateQTracker();
-    askQuestion(0);
+  window.retryStage = function() {
+    state = { phase:'question', qIndex:0, attempts:0, scores:[], correctCount:0 };
+    localStorage.removeItem(sd.storeKey);
+    localStorage.setItem('e100_stage', String(sd.num));
+    addMsg('stella', 'Let\'s go again! Starting from Question 1…').then(function() {
+      updateQTracker();
+      askQuestion(0);
+    });
+  };
+
+  window.sendMessage = function() {
+    if (inputEl.disabled || !inputEl.value.trim()) return;
+    if (state.phase === 'welcome') {
+      handleWelcome();
+    } else if (state.phase === 'question') {
+      handleAnswer();
+    }
+  };
+
+  inputEl.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
   });
+
+  inputEl.addEventListener('input', function() {
+    inputEl.style.height = 'auto';
+    inputEl.style.height = Math.min(inputEl.scrollHeight, 100) + 'px';
+  });
+
+  // Init
+  updateQTracker();
+  startConversation();
 }
-
-// Input handler
-function sendMessage() {
-  if (inputEl.disabled || !inputEl.value.trim()) return;
-  if (state.phase === 'welcome') {
-    handleWelcome();
-  } else if (state.phase === 'question') {
-    handleAnswer();
-  }
-}
-
-// Enter key
-inputEl.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
-});
-
-// Auto-resize textarea
-inputEl.addEventListener('input', () => {
-  inputEl.style.height = 'auto';
-  inputEl.style.height = Math.min(inputEl.scrollHeight, 100) + 'px';
-});
-
-// Init tracker
-updateQTracker();
-
-// Boot
-startConversation();
 </script>
 </body>
 </html>
