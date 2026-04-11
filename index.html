@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Euler100 — The World Junior Mathematics Challenge</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ---- Page-specific styles ---- */
+    .swiss-flag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.6);
+    }
+    .qualifier-strip {
+      background: var(--gold);
+      color: var(--white);
+      text-align: center;
+      padding: 0.6rem 2rem;
+      font-size: 0.83rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .qualifier-strip a { color: var(--white); text-decoration: underline; }
+
+    .stage-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1rem;
+    }
+    @media (max-width: 900px) { .stage-grid { grid-template-columns: repeat(4, 1fr); } }
+    @media (max-width: 560px) { .stage-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .stage-pill {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 1.25rem 1rem;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s;
+      cursor: default;
+    }
+    .stage-pill:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+    .stage-pill .icon  { font-size: 1.75rem; display: block; margin-bottom: 0.5rem; }
+    .stage-pill .lname { font-family: var(--serif); font-size: 0.9rem; font-weight: 700; color: var(--charcoal); display: block; margin-bottom: 0.3rem; }
+    .stage-pill .lnum  { font-size: 0.7rem; color: var(--charcoal-2); text-transform: uppercase; letter-spacing: 0.06em; }
+    .stage-pill.genius { background: linear-gradient(135deg, #3A3A3A, #1a1a1a); }
+    .stage-pill.genius .lname { color: var(--gold); }
+    .stage-pill.genius .lnum  { color: rgba(255,255,255,0.5); }
+
+    .partner-strip {
+      background: var(--bg-2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 1.75rem 2rem;
+      text-align: center;
+    }
+    .partner-strip p { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--charcoal-2); margin-bottom: 1rem; }
+    .partner-logos { display: flex; justify-content: center; align-items: center; gap: 3rem; flex-wrap: wrap; }
+    .partner-logo  { font-family: var(--serif); font-size: 1.1rem; font-weight: 700; color: var(--charcoal-2); }
+    .partner-logo.stella { color: var(--stella); }
+
+    .finale-section {
+      background: linear-gradient(135deg, var(--charcoal) 0%, #2A1500 100%);
+      color: var(--white);
+      padding: 6rem 2rem;
+    }
+    .finale-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    @media (max-width: 768px) { .finale-inner { grid-template-columns: 1fr; gap: 2.5rem; } }
+    .finale-section h2 { color: var(--white); }
+    .finale-section p  { color: rgba(255,255,255,0.75); }
+    .finale-card {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--r-lg);
+      padding: 1.75rem;
+    }
+    .finale-card .fc-row { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .finale-card .fc-row:last-child { border-bottom: none; }
+    .finale-card .fc-label { font-size: 0.82rem; color: rgba(255,255,255,0.5); }
+    .finale-card .fc-value { font-weight: 600; color: var(--white); font-size: 0.95rem; }
+
+    .stella-callout {
+      background: var(--stella-light);
+      border: 1px solid #c5d4f0;
+      border-radius: var(--r-xl);
+      padding: 3rem;
+      display: flex;
+      gap: 2.5rem;
+      align-items: center;
+    }
+    @media (max-width: 680px) { .stella-callout { flex-direction: column; text-align: center; } }
+    .stella-callout .sc-logo { font-family: var(--serif); font-size: 2.5rem; font-weight: 700; color: var(--stella); white-space: nowrap; }
+
+    .faq-item { border-bottom: 1px solid var(--border); padding: 1.25rem 0; }
+    .faq-q { font-weight: 600; color: var(--charcoal); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .faq-q::after { content: '+'; font-size: 1.2rem; color: var(--red); font-weight: 400; }
+    .faq-a { font-size: 0.9rem; color: var(--charcoal-2); padding-top: 0.75rem; display: none; line-height: 1.7; }
+    .faq-item.open .faq-a { display: block; }
+    .faq-item.open .faq-q::after { content: '−'; }
+  </style>
+</head>
+<body>
+
+<!-- Announcement strip -->
+<div class="qualifier-strip">
+  🇨🇭 Inaugural Euler100 Finale — Disentis, Switzerland — October 2027 &nbsp;·&nbsp;
+  <a href="register.html">Register now to begin qualifying →</a>
+</div>
+
+<!-- Navigation -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">E<span>100</span></a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#stages">The 7 Stages</a></li>
+      <li><a href="#finale">Disentis 2027</a></li>
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="stella.html" class="stella-link">STELLA AI Platform</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="stella.html" class="btn btn-ghost btn-sm">Log In</a>
+      <a href="register.html" class="btn btn-primary btn-sm">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="swiss-flag">🇨🇭 A Swiss eduGLOBE Initiative</div>
+    <h1 style="margin-top:1rem;">The World Junior<br>Mathematics Challenge</h1>
+    <p>100 of the world's most talented young mathematicians, 7 stages of qualification, one showdown in the Swiss Alps. Are you ready to prove your genius?</p>
+    <div class="hero-actions">
+      <a href="register.html" class="btn btn-primary btn-lg">Begin Your Journey →</a>
+      <a href="#stages" class="btn btn-outline btn-lg" style="color:#fff;border-color:rgba(255,255,255,0.4);">Explore the Stages</a>
+    </div>
+    <div class="hero-meta">
+      <div class="hero-stat">
+        <div class="label">Finalists</div>
+        <div class="value">100</div>
+      </div>
+      <div class="hero-stat">
+        <div class="label">Stages</div>
+        <div class="value">7</div>
+      </div>
+      <div class="hero-stat">
+        <div class="label">Age Group</div>
+        <div class="value">Under 13</div>
+      </div>
+      <div class="hero-stat">
+        <div class="label">Finale</div>
+        <div class="value">Oct 2027</div>
+      </div>
+      <div class="hero-stat">
+        <div class="label">Location</div>
+        <div class="value">Disentis, Switzerland</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Partner strip -->
+<div class="partner-strip">
+  <p>Qualification platform &amp; AI tutoring powered by</p>
+  <div class="partner-logos">
+    <span class="partner-logo stella">STELLA AI</span>
+    <span class="partner-logo">Swiss eduGLOBE AG</span>
+    <span class="partner-logo" style="font-size:0.85rem;">Disentis, Switzerland 🏔</span>
+  </div>
+</div>
+
+<!-- About section -->
+<section class="section" id="about">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1.1fr;gap:5rem;align-items:center;">
+      <div>
+        <span class="eyebrow">What is Euler100?</span>
+        <h2>Not an Olympiad.<br>A Challenge.</h2>
+        <span class="gold-line"></span>
+        <p style="margin-bottom:1.5rem;">Named after the legendary Swiss mathematician Leonhard Euler, Euler100 is an online mathematics challenge for children under 13. It is deliberately designed to be welcoming, progressive, and globally accessible — not just for children who already excel, but for those who are discovering their potential.</p>
+        <p>Participants progress through 7 stages of increasing difficulty, supported every step by STELLA AI, our intelligent mathematics tutoring platform. The top 100 qualifiers worldwide earn an invitation to the inaugural finale in Disentis, Switzerland in October 2027.</p>
+      </div>
+      <div class="grid-2" style="grid-template-columns:1fr 1fr;">
+        <div class="card card-hover" style="border-top:4px solid var(--red);">
+          <div style="font-size:2rem;margin-bottom:0.75rem;">🌍</div>
+          <h3 style="font-size:1rem;margin-bottom:0.5rem;">Global &amp; Inclusive</h3>
+          <p class="text-sm">Open to any child under 13, anywhere in the world. Available in English, French, Spanish, and German.</p>
+        </div>
+        <div class="card card-hover" style="border-top:4px solid var(--gold);">
+          <div style="font-size:2rem;margin-bottom:0.75rem;">🤖</div>
+          <h3 style="font-size:1rem;margin-bottom:0.5rem;">AI-Supported Learning</h3>
+          <p class="text-sm">STELLA AI provides personalised tutoring, gap analysis, and practice problems tailored to each student.</p>
+        </div>
+        <div class="card card-hover" style="border-top:4px solid var(--stella);">
+          <div style="font-size:2rem;margin-bottom:0.75rem;">🏫</div>
+          <h3 style="font-size:1rem;margin-bottom:0.5rem;">School-Friendly</h3>
+          <p class="text-sm">Teachers can enrol entire classes with a class code. School bundle pricing from $6 per student.</p>
+        </div>
+        <div class="card card-hover" style="border-top:4px solid var(--success);">
+          <div style="font-size:2rem;margin-bottom:0.75rem;">🔒</div>
+          <h3 style="font-size:1rem;margin-bottom:0.5rem;">Child-Safe Platform</h3>
+          <p class="text-sm">Euler aliases protect identity. Parental or teacher consent required. Fully COPPA and GDPR compliant.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- The 7 Stages -->
+<section class="section-sm" id="stages" style="background:var(--bg-2);border-top:1px solid var(--border);">
+  <div class="container">
+    <div class="text-center mb-4">
+      <span class="eyebrow">Qualification Structure</span>
+      <h2>The 7 Stages of Euler100</h2>
+      <p class="mt-2" style="max-width:600px;margin:0.75rem auto 0;">Each stage is harder than the last. Stages 1–3 are free. A one-time $10 USD fee unlocks Stages 4–7 — your pathway to the Genius tier and Disentis.</p>
+    </div>
+    <div class="stage-grid mt-4">
+      <div class="stage-pill s1">
+        <span class="icon">🧭</span>
+        <span class="lname">Explorer</span>
+        <span class="lnum">Stage 1 · Free</span>
+      </div>
+      <div class="stage-pill s2">
+        <span class="icon">🔍</span>
+        <span class="lname">Discoverer</span>
+        <span class="lnum">Stage 2 · Free</span>
+      </div>
+      <div class="stage-pill s3">
+        <span class="icon">🗺️</span>
+        <span class="lname">Pathfinder</span>
+        <span class="lnum">Stage 3 · Free</span>
+      </div>
+      <div class="stage-pill s4">
+        <span class="icon">📚</span>
+        <span class="lname">Scholar</span>
+        <span class="lnum">Stage 4 · $10 unlock</span>
+      </div>
+      <div class="stage-pill s5">
+        <span class="icon">🎓</span>
+        <span class="lname">Cum Laude</span>
+        <span class="lnum">Stage 5 · $10 unlock</span>
+      </div>
+      <div class="stage-pill s6">
+        <span class="icon">🏅</span>
+        <span class="lname">Summa Cum Laude</span>
+        <span class="lnum">Stage 6 · $10 unlock</span>
+      </div>
+      <div class="stage-pill genius">
+        <span class="icon">⭐</span>
+        <span class="lname">Genius</span>
+        <span class="lnum">Stage 7 · Finale</span>
+      </div>
+    </div>
+    <div class="text-center mt-4">
+      <a href="register.html" class="btn btn-primary">Start at Stage 1 — It's Free →</a>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section class="section" id="how">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start;">
+      <div>
+        <span class="eyebrow">How It Works</span>
+        <h2>Your path to Disentis</h2>
+        <span class="red-line"></span>
+        <p class="mt-2 mb-4">From sign-up to showdown, every step is supported by AI-powered tutoring and a global community of young mathematicians.</p>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <strong>Register on STELLA AI</strong>
+              <span>Create your Euler alias with parent or teacher consent. Takes 5 minutes. Free to start.</span>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <strong>Start Stage 1: Explorer</strong>
+              <span>Work with your AI tutor on Grade 7–level mathematics. Complete the stage assessment when ready.</span>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <strong>Progress Through the Stages</strong>
+              <span>Each stage builds on the last. STELLA AI identifies your weak points and targets them with practice.</span>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <strong>Join the Euler Club</strong>
+              <span>Connect with peers in your class, country, and continent. Safe, parent-monitored, alias-protected chat.</span>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-content">
+              <strong>Reach Genius — Go to Disentis</strong>
+              <span>The top 100 qualifiers are personally invited to the finale in Disentis, Switzerland, October 2027.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <span class="eyebrow gold">Pricing</span>
+        <h2>Simple &amp; Fair</h2>
+        <span class="gold-line"></span>
+        <div class="mt-3" style="display:flex;flex-direction:column;gap:1rem;">
+          <div class="card" style="border-left:4px solid var(--success);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+              <strong>Stages 1–3</strong>
+              <span class="badge badge-free">FREE</span>
+            </div>
+            <p class="text-sm">Full access to Explorer, Discoverer, and Pathfinder stages, AI tutoring, and the Euler Club community.</p>
+          </div>
+          <div class="card" style="border-left:4px solid var(--gold);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+              <strong>Stages 4–7 Unlock</strong>
+              <span class="badge badge-paid">$10 once</span>
+            </div>
+            <p class="text-sm">One-time fee unlocks Scholar, Cum Laude, Summa Cum Laude, and Genius — your pathway to Disentis.</p>
+          </div>
+          <div class="card" style="border-left:4px solid var(--stella);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+              <strong>STELLA AI Premium</strong>
+              <span class="badge badge-stella">$3 / month</span>
+            </div>
+            <p class="text-sm">Detailed AI gap analysis reports, priority tutor matching, and advanced practice packs.</p>
+          </div>
+          <div class="card" style="border-left:4px solid var(--charcoal);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+              <strong>School Bundle</strong>
+              <span class="badge" style="background:#e8e8e8;color:var(--charcoal-2);">~$6 / student</span>
+            </div>
+            <p class="text-sm">For classes of 10+. Includes teacher dashboard, class code enrolment, and full stage access.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Finale in Disentis -->
+<section class="finale-section" id="finale">
+  <div class="finale-inner">
+    <div>
+      <span class="eyebrow gold">The Finale</span>
+      <h2 style="color:#fff;">Disentis, Switzerland<br>October 2027</h2>
+      <span class="gold-line"></span>
+      <p style="margin:1.25rem 0 1.5rem;">The 100 global finalists will converge on the historic alpine village of Disentis in the Swiss canton of Graubünden — home of one of Europe's oldest schools — for two extraordinary days of mathematics, competition, and celebration.</p>
+      <p>Each qualifier is invited with one accompanying adult. Travel and accommodation are self-funded. It is the honour of a lifetime.</p>
+      <div class="mt-4">
+        <a href="register.html" class="btn btn-gold btn-lg">Start Qualifying Now →</a>
+      </div>
+    </div>
+    <div>
+      <div class="finale-card">
+        <div class="fc-row">
+          <span class="fc-label">Event</span>
+          <span class="fc-value">Euler100 Inaugural Finale</span>
+        </div>
+        <div class="fc-row">
+          <span class="fc-label">Date</span>
+          <span class="fc-value">October 2027</span>
+        </div>
+        <div class="fc-row">
+          <span class="fc-label">Location</span>
+          <span class="fc-value">Disentis, Graubünden, Switzerland</span>
+        </div>
+        <div class="fc-row">
+          <span class="fc-label">Finalists</span>
+          <span class="fc-value">100 (global)</span>
+        </div>
+        <div class="fc-row">
+          <span class="fc-label">Age Group</span>
+          <span class="fc-value">Under 13 by 31 Dec 2027</span>
+        </div>
+        <div class="fc-row">
+          <span class="fc-label">Accompanied by</span>
+          <span class="fc-value">1 adult per finalist</span>
+        </div>
+        <div class="fc-row">
+          <span class="fc-label">Top award</span>
+          <span class="fc-value" style="color:var(--gold);">⭐ Euler100 Genius</span>
+        </div>
+      </div>
+      <p style="color:rgba(255,255,255,0.4);font-size:0.78rem;margin-top:1rem;text-align:center;">🏔 Kloster Disentis — Founded 720 AD · Elevation 1,130 m</p>
+    </div>
+  </div>
+</section>
+
+<!-- STELLA AI Section -->
+<section class="section" id="stella">
+  <div class="container">
+    <div class="stella-callout">
+      <div class="sc-logo">STELLA<br>AI</div>
+      <div style="flex:1;">
+        <span class="eyebrow stella">Powered by STELLA AI</span>
+        <h2 style="font-size:1.75rem;">Your intelligent mathematics companion</h2>
+        <p class="mt-2 mb-3">STELLA AI is the platform that powers the entire Euler100 qualification journey. Personalised tutoring, intelligent gap analysis, secure child profiles, and a safe global community — all in one place.</p>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+          <a href="stella.html" class="btn btn-stella">Explore STELLA AI →</a>
+          <a href="register.html" class="btn btn-outline" style="border-color:var(--stella);color:var(--stella);">Create your profile</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section-sm" style="background:var(--bg-2);border-top:1px solid var(--border);">
+  <div class="container-sm">
+    <div class="text-center mb-4">
+      <span class="eyebrow">Questions</span>
+      <h2>Frequently Asked</h2>
+    </div>
+    <div class="faq-item open">
+      <div class="faq-q" onclick="toggleFaq(this)">Who can enter Euler100?</div>
+      <div class="faq-a">Any child who is under 13 years of age by 31 December 2027 may participate, regardless of nationality or school type. Registration requires either a parent/guardian's permission or a teacher's enrolment via a class code.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Do I need to be a maths genius to start?</div>
+      <div class="faq-a">Absolutely not. Stage 1 (Explorer) is designed for Grade 6–7 level mathematics. STELLA AI will tutor you at every step. Euler100 is for curious minds, not just top-of-class performers.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What happens to my child's personal data?</div>
+      <div class="faq-a">We take child safety and privacy extremely seriously. Children use an "Euler alias" (a pseudonym) on the platform — their real name is never displayed to other users. The platform is GDPR and COPPA compliant. No data is sold. Parent accounts have full visibility and control.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Is there a cost to participate?</div>
+      <div class="faq-a">Stages 1–3 are completely free. A one-time $10 USD payment unlocks Stages 4–7. There is also an optional $3/month STELLA AI Premium tier. Schools can access a bundle for ~$6 per student for groups of 10 or more.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What language is the challenge in?</div>
+      <div class="faq-a">The platform launches with English, French, Spanish, and German. Portuguese, Arabic, and Hindi will be added before the qualifying period opens in 2026.</div>
+    </div>
+    <div class="text-center mt-4">
+      <a href="register.html" class="btn btn-primary btn-lg">Ready to start? Create your profile →</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">E<sup style="font-size:0.6em">100</sup></div>
+        <p class="footer-tagline mt-2">The World Junior Mathematics Challenge<br>A Swiss eduGLOBE AG Initiative</p>
+        <p style="font-size:0.8rem;color:rgba(255,255,255,0.3);margin-top:1rem;">🇨🇭 Zurich, Switzerland</p>
+      </div>
+      <div class="footer-col">
+        <h4>Challenge</h4>
+        <ul>
+          <li><a href="#about">About Euler100</a></li>
+          <li><a href="#stages">The 7 Stages</a></li>
+          <li><a href="#finale">Disentis Finale</a></li>
+          <li><a href="#how">How It Works</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="stella.html">STELLA AI</a></li>
+          <li><a href="register.html">Register</a></li>
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="#">For Schools</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Child Safety</a></li>
+          <li><a href="#">Terms of Use</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Swiss eduGLOBE AG, Zurich. Euler100 is a not-for-profit event.</span>
+      <span>Demo Prototype — <a href="stella.html">STELLA AI Platform →</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function toggleFaq(el) {
+    const item = el.parentElement;
+    item.classList.toggle('open');
+  }
+
+  // Scroll fade-in animation
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

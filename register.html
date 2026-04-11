@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register — STELLA AI · Euler100</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { background: var(--bg); }
+
+    .register-layout {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 0;
+      min-height: calc(100vh - 68px);
+    }
+    @media (max-width: 900px) { .register-layout { grid-template-columns: 1fr; } }
+
+    .register-main {
+      padding: 3rem 4rem 4rem;
+      max-width: 640px;
+    }
+    @media (max-width: 768px) { .register-main { padding: 2rem 1.5rem; } }
+
+    .register-sidebar {
+      background: linear-gradient(160deg, var(--stella-2) 0%, #1A4090 100%);
+      padding: 3rem 2rem;
+      color: rgba(255,255,255,0.85);
+      position: sticky;
+      top: 68px;
+      height: calc(100vh - 68px);
+      overflow-y: auto;
+    }
+    @media (max-width: 900px) { .register-sidebar { display: none; } }
+    .register-sidebar h3 { color: #fff; font-size: 1.1rem; margin-bottom: 1.5rem; }
+
+    .sidebar-stage {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      font-size: 0.83rem;
+    }
+    .sidebar-stage:last-child { border-bottom: none; }
+    .ss-icon { font-size: 1.1rem; }
+    .ss-text strong { display: block; color: #fff; font-size: 0.85rem; }
+    .ss-text span { font-size: 0.75rem; color: rgba(255,255,255,0.55); }
+    .ss-badge {
+      margin-left: auto;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+    }
+    .ss-free { background: rgba(45,122,61,0.4); color: #7ADA8A; }
+    .ss-paid { background: rgba(160,120,32,0.4); color: #E0C060; }
+
+    /* Step panels */
+    .step-panel { display: none; }
+    .step-panel.active { display: block; animation: stepIn 0.3s ease; }
+    @keyframes stepIn {
+      from { opacity: 0; transform: translateX(16px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 560px) { .form-row { grid-template-columns: 1fr; } }
+
+    .alias-preview {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      background: var(--red-light);
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--red);
+      margin-top: 0.5rem;
+    }
+
+    .consent-box {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+    .consent-box p { font-size: 0.85rem; color: var(--charcoal-2); }
+
+    .email-sent-panel {
+      background: var(--success-bg);
+      border: 1px solid var(--success);
+      border-radius: var(--r-lg);
+      padding: 2rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .email-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+    .email-sent-panel h3 { color: var(--success); margin-bottom: 0.5rem; }
+    .email-sent-panel p { font-size: 0.9rem; color: var(--charcoal-2); }
+
+    .welcome-card {
+      background: linear-gradient(135deg, #1a0808, #3A1A00);
+      border-radius: var(--r-xl);
+      padding: 2.5rem;
+      text-align: center;
+      color: var(--white);
+      margin-bottom: 1.5rem;
+    }
+    .welcome-card .w-icon { font-size: 3.5rem; display: block; margin-bottom: 0.75rem; }
+    .welcome-card h2 { color: var(--white); font-size: 1.75rem; margin-bottom: 0.5rem; }
+    .welcome-card p { color: rgba(255,255,255,0.75); }
+    .welcome-alias {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: var(--r);
+      padding: 0.75rem 1.25rem;
+      margin: 1.25rem 0;
+      display: inline-block;
+    }
+    .welcome-alias .label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.5); }
+    .welcome-alias .value { font-family: var(--serif); font-size: 1.4rem; color: var(--gold); font-weight: 700; }
+
+    .info-pill {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      padding: 0.6rem 1rem;
+      background: var(--bg-2);
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--charcoal-2);
+      margin-bottom: 0.5rem;
+    }
+    .info-pill strong { color: var(--charcoal); }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="stella.html" class="nav-logo stella-logo">STELLA <span style="font-size:0.55em;vertical-align:super;">AI</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Euler100</a></li>
+      <li><a href="stella.html">Platform</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="dashboard.html" class="btn btn-ghost btn-sm">Already registered? Log In</a>
+    </div>
+  </div>
+</nav>
+
+<div class="register-layout">
+
+  <!-- Main content -->
+  <div class="register-main">
+    <div style="margin-bottom:2rem;">
+      <a href="stella.html" style="font-size:0.85rem;color:var(--charcoal-2);text-decoration:none;">← Back to STELLA AI</a>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-bar mb-4" id="progressBar">
+      <div class="progress-step active" id="ps1">
+        <div class="p-dot">1</div>
+        <div class="p-label">Your Profile</div>
+      </div>
+      <div class="progress-step" id="ps2">
+        <div class="p-dot">2</div>
+        <div class="p-label">Your Teacher</div>
+      </div>
+      <div class="progress-step" id="ps3">
+        <div class="p-dot">3</div>
+        <div class="p-label">Parent Consent</div>
+      </div>
+      <div class="progress-step" id="ps4">
+        <div class="p-dot">4</div>
+        <div class="p-label">Welcome!</div>
+      </div>
+    </div>
+
+    <!-- ===== STEP 1: Profile ===== -->
+    <div class="step-panel active" id="step1">
+      <span class="eyebrow stella">Step 1 of 4</span>
+      <h2>Your Euler Profile</h2>
+      <p class="text-muted mt-1 mb-4">Tell us a bit about yourself. All under-13 participants need parent or teacher consent before their account activates.</p>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name <span class="req">*</span></label>
+          <input type="text" id="f_fname" placeholder="e.g. Sophie">
+        </div>
+        <div class="form-group">
+          <label>Last Name <span class="req">*</span></label>
+          <input type="text" id="f_lname" placeholder="e.g. Müller">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Date of Birth <span class="req">*</span></label>
+          <input type="date" id="f_dob" max="2014-12-31" min="2010-01-01">
+          <div class="field-hint">Must be under 13 by 31 Dec 2027</div>
+        </div>
+        <div class="form-group">
+          <label>Country <span class="req">*</span></label>
+          <select id="f_country">
+            <option value="">Select your country…</option>
+            <option>Switzerland 🇨🇭</option>
+            <option>United Kingdom 🇬🇧</option>
+            <option>United States 🇺🇸</option>
+            <option>France 🇫🇷</option>
+            <option>Germany 🇩🇪</option>
+            <option>Spain 🇪🇸</option>
+            <option>India 🇮🇳</option>
+            <option>Brazil 🇧🇷</option>
+            <option>Canada 🇨🇦</option>
+            <option>Australia 🇦🇺</option>
+            <option>Singapore 🇸🇬</option>
+            <option>South Africa 🇿🇦</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>School Name <span class="req">*</span></label>
+        <input type="text" id="f_school" placeholder="e.g. International School of Zurich">
+      </div>
+
+      <div class="form-group">
+        <label>Choose Your Euler Alias <span class="req">*</span></label>
+        <input type="text" id="f_alias" placeholder="e.g. MathWizard42" maxlength="20" oninput="updateAliasPreview()">
+        <div class="field-hint">Your unique nickname on the platform. 4–20 characters, no spaces. This is what other users will see — not your real name.</div>
+        <div id="alias-preview" style="display:none;" class="alias-preview">🧭 <span id="alias-val"></span></div>
+        <div class="field-error" id="alias-error">Alias must be 4–20 characters with no spaces.</div>
+      </div>
+
+      <div class="form-group">
+        <label>Platform Language</label>
+        <select id="f_lang">
+          <option>English</option>
+          <option>French</option>
+          <option>German</option>
+          <option>Spanish</option>
+        </select>
+      </div>
+
+      <button class="btn btn-stella btn-lg btn-full" onclick="goToStep2()">Continue to Step 2 →</button>
+      <div class="field-error show" id="step1-error" style="margin-top:0.75rem;display:none;"></div>
+    </div>
+
+    <!-- ===== STEP 2: Teacher ===== -->
+    <div class="step-panel" id="step2">
+      <span class="eyebrow stella">Step 2 of 4</span>
+      <h2>Your Teacher</h2>
+      <p class="text-muted mt-1 mb-3">Provide your teacher's details. Your teacher will be listed as your responsible adult contact on the platform. This helps us keep Euler100 safe for all participants.</p>
+
+      <div class="alert alert-info" style="font-size:0.85rem;">
+        💡 <strong>No teacher?</strong> You can skip this step and use parent consent only in Step 3. Your teacher's details are optional but help us verify your school.
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Teacher First Name</label>
+          <input type="text" id="t_fname" placeholder="e.g. Elena">
+        </div>
+        <div class="form-group">
+          <label>Teacher Last Name</label>
+          <input type="text" id="t_lname" placeholder="e.g. Rossi">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Teacher School Email</label>
+        <input type="email" id="t_email" placeholder="e.g. e.rossi@isz.ch">
+        <div class="field-hint">We'll send your teacher a notification that you've registered for Euler100.</div>
+      </div>
+
+      <div class="form-group">
+        <label>Class / Year Group</label>
+        <input type="text" id="t_class" placeholder="e.g. Year 7B or Grade 6">
+      </div>
+
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:0.5rem;">
+        <button class="btn btn-ghost" onclick="goToStep(1)">← Back</button>
+        <button class="btn btn-stella btn-lg" style="flex:1;" onclick="goToStep3()">Continue to Step 3 →</button>
+      </div>
+    </div>
+
+    <!-- ===== STEP 3: Parent Consent ===== -->
+    <div class="step-panel" id="step3">
+      <span class="eyebrow stella">Step 3 of 4</span>
+      <h2>Parent Permission</h2>
+      <p class="text-muted mt-1 mb-3">By law, we need a parent or guardian's consent before your account can be activated. Please provide their details below.</p>
+
+      <div class="consent-box">
+        <p>We will send a permission request to your parent or guardian. They will receive a simple email with a link to approve your registration. Your account is not active until they click "Approve".</p>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Parent / Guardian First Name <span class="req">*</span></label>
+          <input type="text" id="p_fname" placeholder="e.g. Hans">
+        </div>
+        <div class="form-group">
+          <label>Parent / Guardian Last Name <span class="req">*</span></label>
+          <input type="text" id="p_lname" placeholder="e.g. Müller">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Parent / Guardian Email Address <span class="req">*</span></label>
+        <input type="email" id="p_email" placeholder="e.g. hans.muller@email.com">
+        <div class="field-hint">We will send only one email. No marketing emails will be sent without separate consent.</div>
+      </div>
+
+      <div class="form-group">
+        <label>Relationship to Child <span class="req">*</span></label>
+        <select id="p_rel">
+          <option>Mother</option>
+          <option>Father</option>
+          <option>Guardian</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label style="display:flex;gap:0.75rem;align-items:flex-start;font-weight:400;cursor:pointer;">
+          <input type="checkbox" id="p_agree" style="width:auto;margin-top:3px;">
+          <span style="font-size:0.85rem;color:var(--charcoal-2);">I confirm that I am the child's parent or guardian and that the information provided is accurate. I understand that a consent email will be sent to the address above.</span>
+        </label>
+      </div>
+
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:0.5rem;">
+        <button class="btn btn-ghost" onclick="goToStep(2)">← Back</button>
+        <button class="btn btn-stella btn-lg" style="flex:1;" onclick="sendConsent()">Send Permission Request →</button>
+      </div>
+      <div class="field-error show" id="step3-error" style="margin-top:0.75rem;display:none;"></div>
+    </div>
+
+    <!-- ===== STEP 3b: Email Sent ===== -->
+    <div class="step-panel" id="step3b">
+      <div class="email-sent-panel">
+        <div class="email-icon">📧</div>
+        <h3>Permission Request Sent!</h3>
+        <p>We've sent a consent email to <strong id="parent-email-display"></strong>.<br>Ask your parent to check their inbox and click the approval link.</p>
+      </div>
+      <p class="text-sm text-muted mb-3" style="text-align:center;">In a real deployment, you would wait for your parent to click the link in their email. For this demo, click below to simulate approval.</p>
+
+      <!-- Demo-only button to simulate parent approval -->
+      <button class="btn btn-success btn-lg btn-full" onclick="simulateApproval()" style="gap:0.75rem;">
+        ✉️ Simulate: Parent clicked "I Approve" in email →
+      </button>
+      <div style="text-align:center;margin-top:1rem;">
+        <a href="#" style="font-size:0.82rem;color:var(--charcoal-2);">Re-send the email</a>
+      </div>
+    </div>
+
+    <!-- ===== STEP 4: Welcome ===== -->
+    <div class="step-panel" id="step4">
+      <div class="welcome-card">
+        <span class="w-icon">🎉</span>
+        <h2>Welcome to Euler100!</h2>
+        <p>Your account is active. Your Euler journey begins now.</p>
+        <div class="welcome-alias">
+          <div class="label">Your Euler Alias</div>
+          <div class="value" id="welcome-alias-display">—</div>
+        </div>
+        <p style="font-size:0.82rem;color:rgba(255,255,255,0.6);">This is the name others will see. Your real name stays private.</p>
+      </div>
+
+      <div style="margin-bottom:1.5rem;">
+        <div class="info-pill"><span>🧭</span> <span>Stage 1: <strong>Explorer</strong> — unlocked and ready</span></div>
+        <div class="info-pill"><span>🌍</span> <span>Community access: <strong>Class level</strong> (Euler Club)</span></div>
+        <div class="info-pill"><span>🤖</span> <span>STELLA AI tutor: <strong>Active</strong></span></div>
+        <div class="info-pill"><span>✅</span> <span>Parent consent: <strong>Confirmed</strong></span></div>
+      </div>
+
+      <div class="alert alert-success">
+        🏁 <strong>You're all set!</strong> Start Stage 1: Explorer with your AI tutor. Complete 5 maths questions to advance to Stage 2: Discoverer.
+      </div>
+
+      <a href="dashboard.html" class="btn btn-primary btn-lg btn-full" style="margin-top:0.5rem;">Go to My Dashboard →</a>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="register-sidebar">
+    <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.4);margin-bottom:0.5rem;">What you're signing up for</div>
+    <h3>The 7 Stages of Euler100</h3>
+    <div class="sidebar-stage">
+      <span class="ss-icon">🧭</span>
+      <div class="ss-text"><strong>Stage 1: Explorer</strong><span>Grade 7 mathematics</span></div>
+      <span class="ss-badge ss-free">FREE</span>
+    </div>
+    <div class="sidebar-stage">
+      <span class="ss-icon">🔍</span>
+      <div class="ss-text"><strong>Stage 2: Discoverer</strong><span>Grade 7–8 mathematics</span></div>
+      <span class="ss-badge ss-free">FREE</span>
+    </div>
+    <div class="sidebar-stage">
+      <span class="ss-icon">🗺️</span>
+      <div class="ss-text"><strong>Stage 3: Pathfinder</strong><span>Grade 8 mathematics</span></div>
+      <span class="ss-badge ss-free">FREE</span>
+    </div>
+    <div class="sidebar-stage">
+      <span class="ss-icon">📚</span>
+      <div class="ss-text"><strong>Stage 4: Scholar</strong><span>Advanced problem solving</span></div>
+      <span class="ss-badge ss-paid">$10 unlock</span>
+    </div>
+    <div class="sidebar-stage">
+      <span class="ss-icon">🎓</span>
+      <div class="ss-text"><strong>Stage 5: Cum Laude</strong><span>Competition mathematics</span></div>
+      <span class="ss-badge ss-paid">$10 unlock</span>
+    </div>
+    <div class="sidebar-stage">
+      <span class="ss-icon">🏅</span>
+      <div class="ss-text"><strong>Stage 6: Summa Cum Laude</strong><span>Pre-olympiad level</span></div>
+      <span class="ss-badge ss-paid">$10 unlock</span>
+    </div>
+    <div class="sidebar-stage">
+      <span class="ss-icon">⭐</span>
+      <div class="ss-text"><strong>Stage 7: Genius</strong><span>Top 100 — Disentis 2027</span></div>
+      <span class="ss-badge ss-paid">Finale</span>
+    </div>
+
+    <div style="margin-top:2rem;padding:1.25rem;background:rgba(255,255,255,0.07);border-radius:var(--r);border:1px solid rgba(255,255,255,0.12);">
+      <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.4);margin-bottom:0.75rem;">Why we need consent</div>
+      <p style="font-size:0.82rem;color:rgba(255,255,255,0.65);">STELLA AI is a child-safe platform. EU GDPR and US COPPA require explicit parental consent for users under 13. We never store more data than necessary and we never sell data to third parties.</p>
+    </div>
+
+    <div style="margin-top:1.5rem;text-align:center;">
+      <a href="index.html" style="font-size:0.8rem;color:rgba(255,255,255,0.4);">← Back to euler.swiss</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const steps = [null, 'step1','step2','step3','step3b','step4'];
+  const pSteps = [null, 'ps1','ps2','ps3','ps4'];
+  let currentStep = 1;
+  let studentAlias = '';
+
+  function showStep(n) {
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById(n === '3b' ? 'step3b' : 'step' + n);
+    if (panel) panel.classList.add('active');
+  }
+
+  function setProgress(n) {
+    document.querySelectorAll('.progress-step').forEach((el, i) => {
+      el.classList.remove('active','done');
+      if (i < n - 1) el.classList.add('done');
+      else if (i === n - 1) el.classList.add('active');
+    });
+    // Update dots text for done steps
+    document.querySelectorAll('.progress-step.done .p-dot').forEach(d => { if (!d.textContent.includes('✓')) d.textContent = '✓'; });
+  }
+
+  function updateAliasPreview() {
+    const v = document.getElementById('f_alias').value.trim();
+    const pre = document.getElementById('alias-preview');
+    const val = document.getElementById('alias-val');
+    const err = document.getElementById('alias-error');
+    if (v.length >= 4) {
+      pre.style.display = 'inline-flex';
+      val.textContent = v;
+      err.style.display = 'none';
+    } else {
+      pre.style.display = 'none';
+    }
+  }
+
+  function goToStep(n) {
+    showStep(n);
+    setProgress(n);
+    currentStep = n;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function goToStep2() {
+    const fname = document.getElementById('f_fname').value.trim();
+    const lname = document.getElementById('f_lname').value.trim();
+    const dob   = document.getElementById('f_dob').value;
+    const country = document.getElementById('f_country').value;
+    const school  = document.getElementById('f_school').value.trim();
+    const alias   = document.getElementById('f_alias').value.trim();
+    const errEl   = document.getElementById('step1-error');
+
+    if (!fname || !lname) { showErr(errEl, 'Please enter your first and last name.'); return; }
+    if (!dob)             { showErr(errEl, 'Please enter your date of birth.'); return; }
+    if (!country)         { showErr(errEl, 'Please select your country.'); return; }
+    if (!school)          { showErr(errEl, 'Please enter your school name.'); return; }
+    if (alias.length < 4 || alias.includes(' ')) { showErr(errEl, 'Alias must be 4–20 characters with no spaces.'); return; }
+
+    errEl.style.display = 'none';
+    studentAlias = alias;
+    // Save to localStorage for other pages
+    localStorage.setItem('e100_alias', alias);
+    localStorage.setItem('e100_name', fname);
+    localStorage.setItem('e100_school', school);
+    localStorage.setItem('e100_country', country);
+    localStorage.setItem('e100_stage', '1');
+    localStorage.setItem('e100_registered', 'yes');
+    goToStep(2);
+  }
+
+  function goToStep3() {
+    // Teacher is optional — just go to step 3
+    const tf = document.getElementById('t_fname').value.trim();
+    const tl = document.getElementById('t_lname').value.trim();
+    if (tf) localStorage.setItem('e100_teacher', tf + (tl ? ' ' + tl : ''));
+    goToStep(3);
+  }
+
+  function sendConsent() {
+    const pf    = document.getElementById('p_fname').value.trim();
+    const pe    = document.getElementById('p_email').value.trim();
+    const agree = document.getElementById('p_agree').checked;
+    const errEl = document.getElementById('step3-error');
+
+    if (!pf)         { showErr(errEl, 'Please enter the parent or guardian's name.'); return; }
+    if (!pe || !pe.includes('@')) { showErr(errEl, 'Please enter a valid parent email address.'); return; }
+    if (!agree)      { showErr(errEl, 'Please confirm that you are the parent or guardian.'); return; }
+
+    errEl.style.display = 'none';
+    document.getElementById('parent-email-display').textContent = pe;
+    showStep('3b');
+    setProgress(3);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function simulateApproval() {
+    document.getElementById('welcome-alias-display').textContent = studentAlias || localStorage.getItem('e100_alias') || 'MathWizard42';
+    goToStep(4);
+    setProgress(4);
+  }
+
+  function showErr(el, msg) {
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  // Pre-fill alias if returning
+  window.addEventListener('load', () => {
+    const saved = localStorage.getItem('e100_alias');
+    if (saved) {
+      document.getElementById('f_alias').value = saved;
+      updateAliasPreview();
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STELLA AI — Intelligent Mathematics Learning Platform</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .hero-stella { background: linear-gradient(135deg, var(--stella-2) 0%, #1A4090 60%, #0E2547 100%); }
+    .hero-stella p { color: rgba(255,255,255,0.8); }
+
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+    }
+    @media (max-width: 768px) { .how-grid { grid-template-columns: 1fr 1fr; } }
+    .how-item {
+      padding: 2rem 1.5rem;
+      border-right: 1px solid var(--border);
+      background: var(--white);
+      text-align: center;
+    }
+    .how-item:last-child { border-right: none; }
+    .how-num {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--stella);
+      color: #fff; font-weight: 700; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 0.75rem;
+    }
+    .how-icon { font-size: 1.75rem; margin-bottom: 0.75rem; }
+    .how-item h4 { margin-bottom: 0.4rem; }
+    .how-item p { font-size: 0.82rem; }
+
+    .feature-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+    @media (max-width: 768px) { .feature-row { grid-template-columns: 1fr; gap: 2.5rem; } }
+    .feature-row.reverse { direction: rtl; }
+    .feature-row.reverse > * { direction: ltr; }
+
+    .screen-mock {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+    .screen-bar {
+      background: var(--bg-2);
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .screen-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .screen-url {
+      flex: 1;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.72rem;
+      color: var(--charcoal-2);
+      text-align: center;
+      margin: 0 0.75rem;
+    }
+    .screen-body { padding: 1.5rem; }
+
+    .chat-preview {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .cp-msg {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+    }
+    .cp-msg.right { flex-direction: row-reverse; }
+    .cp-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--stella-light);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; flex-shrink: 0;
+    }
+    .cp-msg.right .cp-avatar { background: var(--red-light); }
+    .cp-bubble {
+      padding: 0.5rem 0.85rem;
+      border-radius: 12px;
+      font-size: 0.78rem;
+      max-width: 220px;
+      line-height: 1.5;
+    }
+    .cp-msg.left .cp-bubble { background: var(--bg); border: 1px solid var(--border); }
+    .cp-msg.right .cp-bubble { background: var(--stella); color: #fff; }
+
+    .consent-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .cf-step {
+      display: flex;
+      gap: 0.85rem;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background: var(--bg);
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+    }
+    .cf-step.done { background: var(--success-bg); border-color: var(--success); }
+    .cf-icon { font-size: 1.1rem; }
+    .cf-text { font-size: 0.8rem; }
+    .cf-text strong { display: block; font-size: 0.82rem; }
+
+    .euler-portal-card {
+      background: linear-gradient(135deg, #1A0808 0%, #3A1A00 100%);
+      border-radius: var(--r-xl);
+      padding: 3.5rem;
+      color: var(--white);
+      display: flex;
+      gap: 3rem;
+      align-items: center;
+    }
+    @media (max-width: 768px) { .euler-portal-card { flex-direction: column; padding: 2rem; gap: 2rem; } }
+    .ep-logo { font-family: var(--serif); font-size: 3rem; font-weight: 700; color: var(--gold); white-space: nowrap; line-height: 1; }
+    .ep-logo sup { font-size: 0.45em; }
+    .euler-portal-card h2 { color: var(--white); margin-bottom: 0.75rem; }
+    .euler-portal-card p { color: rgba(255,255,255,0.75); margin-bottom: 1.5rem; }
+
+    .teacher-feature {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 680px) { .teacher-feature { grid-template-columns: 1fr; } }
+
+    .pricing-cta {
+      background: var(--stella-light);
+      border: 1px solid #c5d4f0;
+      border-radius: var(--r-xl);
+      padding: 3rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="stella.html" class="nav-logo stella-logo">STELLA <span style="font-size:0.55em;vertical-align:super;">AI</span></a>
+    <ul class="nav-links">
+      <li><a href="#how-stella">How It Works</a></li>
+      <li><a href="#euler-portal">Euler Portal</a></li>
+      <li><a href="#for-teachers">For Teachers</a></li>
+      <li><a href="index.html">← Euler100</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="dashboard.html" class="btn btn-ghost btn-sm">Log In</a>
+      <a href="register.html" class="btn btn-stella btn-sm">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero hero-stella">
+  <div class="hero-inner">
+    <span class="eyebrow" style="color:rgba(255,255,255,0.55);">stella.global</span>
+    <h1>AI-Powered<br>Mathematics Learning</h1>
+    <p>STELLA AI provides personalised, intelligent mathematics tutoring for learners of any age — and is the official qualification platform for Euler100, the World Junior Mathematics Challenge.</p>
+    <div class="hero-actions mt-3">
+      <a href="register.html" class="btn btn-primary btn-lg">Start the Euler100 Journey →</a>
+      <a href="#how-stella" class="btn btn-outline btn-lg" style="color:#fff;border-color:rgba(255,255,255,0.4);">How STELLA Works</a>
+    </div>
+    <div class="hero-meta">
+      <div class="hero-stat">
+        <div class="label">Powered by</div>
+        <div class="value" style="font-size:1.2rem;">Claude AI</div>
+      </div>
+      <div class="hero-stat">
+        <div class="label">Languages</div>
+        <div class="value" style="font-size:1.2rem;">4 (launch)</div>
+      </div>
+      <div class="hero-stat">
+        <div class="label">Consent model</div>
+        <div class="value" style="font-size:1.2rem;">GDPR + COPPA</div>
+      </div>
+      <div class="hero-stat">
+        <div class="label">Hosting</div>
+        <div class="value" style="font-size:1.2rem;">Swiss Infrastructure</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How STELLA works -->
+<section class="section" id="how-stella">
+  <div class="container">
+    <div class="text-center mb-4">
+      <span class="eyebrow stella">Platform Overview</span>
+      <h2>How STELLA AI Works</h2>
+      <p class="mt-2" style="max-width:560px;margin:0.75rem auto 0;">STELLA is your intelligent mathematics companion. It learns your strengths, finds your gaps, and gives you exactly the practice you need — at exactly the right level.</p>
+    </div>
+    <div class="how-grid">
+      <div class="how-item">
+        <div class="how-icon">📋</div>
+        <div class="how-num">1</div>
+        <h4>Create Your Profile</h4>
+        <p class="text-muted">Register with parent or teacher consent. Choose your Euler alias. Your identity is always protected.</p>
+      </div>
+      <div class="how-item">
+        <div class="how-icon">🤖</div>
+        <div class="how-num">2</div>
+        <h4>Meet STELLA</h4>
+        <p class="text-muted">Your AI tutor — powered by Claude — assesses your level and begins personalised mathematics coaching.</p>
+      </div>
+      <div class="how-item">
+        <div class="how-icon">📈</div>
+        <div class="how-num">3</div>
+        <h4>Practice &amp; Progress</h4>
+        <p class="text-muted">Work through targeted practice, get instant feedback, and advance through stages when you're ready.</p>
+      </div>
+      <div class="how-item">
+        <div class="how-icon">🏆</div>
+        <div class="how-num">4</div>
+        <h4>Qualify for Euler100</h4>
+        <p class="text-muted">Complete the 7 stages of Euler100 via STELLA. Top 100 qualifiers go to Disentis, Switzerland.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Feature: AI Tutor -->
+<section class="section" style="background:var(--bg-2);border-top:1px solid var(--border);">
+  <div class="container">
+    <div class="feature-row">
+      <div>
+        <span class="eyebrow stella">AI Tutoring</span>
+        <h2>Your personal maths coach — always available</h2>
+        <span style="display:block;width:48px;height:3px;background:var(--stella);border-radius:2px;margin:1rem 0;"></span>
+        <p class="mb-3">STELLA's AI tutor — powered by Claude — doesn't just give you the answer. It asks you questions, spots where you're stuck, provides hints, explains concepts step-by-step, and celebrates your progress.</p>
+        <div class="feature-item">
+          <div class="feature-icon">💬</div>
+          <div class="feature-text">
+            <strong>Conversational Learning</strong>
+            <span>Chat naturally with STELLA. Ask anything. STELLA responds in your language and at your level.</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🎯</div>
+          <div class="feature-text">
+            <strong>Targeted Practice</strong>
+            <span>AI identifies your weak areas and sends you exactly the problems you need to improve.</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">💡</div>
+          <div class="feature-text">
+            <strong>Hints, Not Answers</strong>
+            <span>STELLA guides you to the answer rather than giving it away — building genuine understanding.</span>
+          </div>
+        </div>
+      </div>
+      <div class="screen-mock">
+        <div class="screen-bar">
+          <div class="screen-dot" style="background:#FF5F57;"></div>
+          <div class="screen-dot" style="background:#FEBC2E;"></div>
+          <div class="screen-dot" style="background:#28C840;"></div>
+          <div class="screen-url">stella.global/tutor</div>
+        </div>
+        <div class="screen-body">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+            <div>
+              <strong style="font-size:0.9rem;">Stage 1: Explorer</strong>
+              <div style="font-size:0.75rem;color:var(--charcoal-2);">Question 3 of 5</div>
+            </div>
+            <div style="display:flex;gap:0.3rem;">
+              <div style="width:22px;height:22px;border-radius:50%;background:var(--success);display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:#fff;font-weight:700;">✓</div>
+              <div style="width:22px;height:22px;border-radius:50%;background:var(--success);display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:#fff;font-weight:700;">✓</div>
+              <div style="width:22px;height:22px;border-radius:50%;background:var(--stella);display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:#fff;font-weight:700;">3</div>
+              <div style="width:22px;height:22px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:var(--charcoal-2);font-weight:700;">4</div>
+              <div style="width:22px;height:22px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:var(--charcoal-2);font-weight:700;">5</div>
+            </div>
+          </div>
+          <div class="chat-preview">
+            <div class="cp-msg left">
+              <div class="cp-avatar">🤖</div>
+              <div class="cp-bubble">Great work on the first two! Ready for question 3?<br><br><strong style="font-size:0.82rem;">If 3x + 7 = 22, what is the value of x?</strong></div>
+            </div>
+            <div class="cp-msg right">
+              <div class="cp-avatar">🧭</div>
+              <div class="cp-bubble">Hmm, is it 4?</div>
+            </div>
+            <div class="cp-msg left">
+              <div class="cp-avatar">🤖</div>
+              <div class="cp-bubble">Not quite — you're close! Try subtracting 7 from both sides first. What do you get?</div>
+            </div>
+            <div class="cp-msg right">
+              <div class="cp-avatar">🧭</div>
+              <div class="cp-bubble">Oh! 3x = 15, so x = 5?</div>
+            </div>
+            <div class="cp-msg left">
+              <div class="cp-avatar">🤖</div>
+              <div class="cp-bubble">✓ Exactly right! x = 5. Excellent reasoning!</div>
+            </div>
+          </div>
+          <div style="margin-top:1rem;display:flex;gap:0.5rem;">
+            <input type="text" placeholder="Type your answer..." style="font-size:0.8rem;padding:0.5rem 0.75rem;border-radius:20px;">
+            <button class="btn btn-stella btn-sm">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Feature: Consent Flow -->
+<section class="section">
+  <div class="container">
+    <div class="feature-row reverse">
+      <div>
+        <span class="eyebrow">Child Safety</span>
+        <h2>Designed for children.<br>Trusted by parents.</h2>
+        <span class="red-line"></span>
+        <p class="mb-3">Every STELLA account for a child under 13 requires explicit consent from a parent or teacher before the learner can access any content. We use two routes: parental email consent, or teacher-managed class enrolment.</p>
+        <div class="feature-item">
+          <div class="feature-icon">📧</div>
+          <div class="feature-text">
+            <strong>Route A — Parent Consent</strong>
+            <span>Child registers, parent receives a consent email, parent approves. Account activates instantly.</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🏫</div>
+          <div class="feature-text">
+            <strong>Route B — Teacher Enrolment</strong>
+            <span>Teacher creates a class code. Children join the class. Teacher acts as responsible adult on the platform.</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🎭</div>
+          <div class="feature-text">
+            <strong>Euler Alias System</strong>
+            <span>Children choose a creative pseudonym — their "Euler alias". Real names are never shown to other users.</span>
+          </div>
+        </div>
+      </div>
+      <div class="screen-mock">
+        <div class="screen-bar">
+          <div class="screen-dot" style="background:#FF5F57;"></div>
+          <div class="screen-dot" style="background:#FEBC2E;"></div>
+          <div class="screen-dot" style="background:#28C840;"></div>
+          <div class="screen-url">stella.global/register</div>
+        </div>
+        <div class="screen-body">
+          <div style="font-size:0.8rem;font-weight:700;color:var(--charcoal);margin-bottom:0.75rem;">Step 3 of 4 — Parent Permission</div>
+          <div class="consent-flow">
+            <div class="cf-step done">
+              <div class="cf-icon">✅</div>
+              <div class="cf-text">
+                <strong>Your Profile</strong>
+                <span style="color:var(--charcoal-2);">Alias: MathWizard42 · Age: 11 · Switzerland</span>
+              </div>
+            </div>
+            <div class="cf-step done">
+              <div class="cf-icon">✅</div>
+              <div class="cf-text">
+                <strong>Your Teacher</strong>
+                <span style="color:var(--charcoal-2);">Ms. Elena Rossi · International School Zurich</span>
+              </div>
+            </div>
+            <div class="cf-step" style="border-color:var(--stella);background:var(--stella-light);">
+              <div class="cf-icon">📧</div>
+              <div class="cf-text">
+                <strong>Parent Permission</strong>
+                <span style="color:var(--stella);">Sending request to: parent@family.com</span>
+              </div>
+            </div>
+            <div class="cf-step" style="opacity:0.5;">
+              <div class="cf-icon">🧭</div>
+              <div class="cf-text">
+                <strong>Welcome to Euler100!</strong>
+                <span style="color:var(--charcoal-2);">Pending parent approval</span>
+              </div>
+            </div>
+          </div>
+          <div class="alert alert-info mt-3" style="font-size:0.78rem;">
+            📩 A consent email has been sent to your parent. Ask them to check their inbox to activate your account!
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Euler Portal -->
+<section class="section-sm" style="background:var(--bg-2);border-top:1px solid var(--border);" id="euler-portal">
+  <div class="container">
+    <div class="euler-portal-card">
+      <div>
+        <div class="ep-logo">E<sup>100</sup></div>
+        <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);margin-top:0.4rem;letter-spacing:0.1em;text-transform:uppercase;">Euler Portal within STELLA</div>
+      </div>
+      <div style="flex:1;">
+        <span class="eyebrow gold">Official Qualification Home</span>
+        <h2>The Euler Portal</h2>
+        <p>Inside STELLA AI is the dedicated Euler Portal — your dashboard for tracking progress through the 7 stages of Euler100. Your Euler Club ID, your stage progress, your community connections — all in one secure place.</p>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+          <a href="register.html" class="btn btn-gold">Create Your Euler Profile →</a>
+          <a href="dashboard.html" class="btn btn-outline" style="border-color:rgba(255,255,255,0.4);color:rgba(255,255,255,0.8);">Preview Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- For Teachers -->
+<section class="section" id="for-teachers">
+  <div class="container">
+    <div class="text-center mb-4">
+      <span class="eyebrow">Education Partners</span>
+      <h2>Built for classrooms too</h2>
+      <p class="mt-2" style="max-width:520px;margin:0.75rem auto 0;">STELLA AI is designed to work seamlessly with schools. Teachers get their own dashboard to enrol students, monitor progress, and manage consent — all without needing parent contact for every student.</p>
+    </div>
+    <div class="teacher-feature">
+      <div class="card card-hover" style="border-top:4px solid var(--stella);">
+        <div style="font-size:2rem;margin-bottom:0.75rem;">🔑</div>
+        <h3>Class Code Enrolment</h3>
+        <p class="text-sm mt-1">Create a class code and share it with your students. They join instantly — teacher acts as responsible adult. No individual parent emails required.</p>
+      </div>
+      <div class="card card-hover" style="border-top:4px solid var(--gold);">
+        <div style="font-size:2rem;margin-bottom:0.75rem;">📊</div>
+        <h3>Class Progress Dashboard</h3>
+        <p class="text-sm mt-1">See every student's stage progress, time spent, areas of difficulty, and AI tutor interaction logs — all in one teacher view.</p>
+      </div>
+      <div class="card card-hover" style="border-top:4px solid var(--red);">
+        <div style="font-size:2rem;margin-bottom:0.75rem;">💰</div>
+        <h3>School Bundle Pricing</h3>
+        <p class="text-sm mt-1">Groups of 10+ students unlock the school bundle rate: approximately $6 per student for full platform access across all 7 Euler100 stages.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section-sm" style="background:var(--stella);padding:5rem 2rem;">
+  <div class="container text-center">
+    <h2 style="color:var(--white);">Ready to begin the Euler100 journey?</h2>
+    <p style="color:rgba(255,255,255,0.8);max-width:500px;margin:1rem auto 2rem;">Create your learner profile in 5 minutes. Free to start. Parent or teacher consent required for under-13s.</p>
+    <div style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;">
+      <a href="register.html" class="btn btn-primary btn-lg">Create Your Profile →</a>
+      <a href="index.html" class="btn btn-outline btn-lg" style="border-color:rgba(255,255,255,0.5);color:rgba(255,255,255,0.9);">← Back to Euler100</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">STELLA <sup style="font-size:0.5em">AI</sup></div>
+        <p class="footer-tagline mt-2">Intelligent Mathematics Learning<br>A Swiss eduGLOBE AG Platform</p>
+        <p style="font-size:0.8rem;color:rgba(255,255,255,0.3);margin-top:1rem;">🇨🇭 swiss infrastructure · stella.global</p>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="#how-stella">How It Works</a></li>
+          <li><a href="#euler-portal">Euler Portal</a></li>
+          <li><a href="#for-teachers">For Teachers</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Euler100</h4>
+        <ul>
+          <li><a href="index.html">euler.swiss</a></li>
+          <li><a href="register.html">Register</a></li>
+          <li><a href="dashboard.html">Dashboard</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Child Safety</a></li>
+          <li><a href="#">Terms of Use</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Swiss eduGLOBE AG. STELLA AI is a for-profit platform.</span>
+      <span><a href="index.html">Euler100 ←</a></span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

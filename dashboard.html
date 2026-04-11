@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Dashboard — STELLA AI · Euler100</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .dashboard-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: calc(100vh - 68px);
+    }
+    @media (max-width: 900px) { .dashboard-layout { grid-template-columns: 1fr; } }
+
+    /* Sidebar */
+    .dash-sidebar {
+      background: var(--charcoal);
+      padding: 2rem 1.25rem;
+      color: rgba(255,255,255,0.75);
+      position: sticky;
+      top: 68px;
+      height: calc(100vh - 68px);
+      overflow-y: auto;
+    }
+    @media (max-width: 900px) { .dash-sidebar { display: none; } }
+
+    .user-card {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--r-lg);
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .user-avatar {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--red);
+      color: #fff;
+      font-family: var(--serif);
+      font-size: 1.4rem;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 0.75rem;
+    }
+    .user-alias { font-family: var(--serif); font-size: 1.1rem; color: #fff; font-weight: 700; }
+    .user-meta  { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 0.25rem; }
+    .user-stage { margin-top:0.75rem; display:inline-flex; align-items:center; gap:0.4rem; padding:0.3rem 0.75rem; background:var(--red-light); border-radius:20px; font-size:0.75rem; font-weight:700; color:var(--red); }
+
+    .sidebar-nav { list-style:none; margin-bottom:2rem; }
+    .sidebar-nav li a {
+      display: flex; align-items: center; gap:0.75rem;
+      padding: 0.65rem 0.75rem;
+      border-radius: var(--r);
+      font-size: 0.875rem;
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .sidebar-nav li a:hover { background: rgba(255,255,255,0.07); color: #fff; }
+    .sidebar-nav li a.active { background: rgba(204,26,26,0.25); color: #fff; }
+    .sidebar-nav .nav-icon { width: 18px; text-align: center; font-size: 1rem; }
+
+    .sidebar-section { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.12em; color:rgba(255,255,255,0.3); margin:1.25rem 0 0.5rem 0.75rem; }
+
+    /* Main */
+    .dash-main { padding: 2.5rem 3rem; }
+    @media (max-width: 768px) { .dash-main { padding: 1.5rem; } }
+
+    .dash-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    /* Progress overview bar */
+    .progress-overview {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 1.5rem 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .po-stage {
+      font-family: var(--serif);
+      font-size: 0.95rem;
+      color: var(--charcoal-2);
+    }
+    .po-stage strong { display: block; font-size: 1.2rem; color: var(--charcoal); }
+    .po-bar { flex: 1; min-width: 200px; }
+    .po-bar .label { font-size: 0.75rem; color: var(--charcoal-2); margin-bottom:0.4rem; display:flex; justify-content:space-between; }
+    .bar-track { height: 8px; background: var(--bg-2); border-radius: 4px; overflow: hidden; }
+    .bar-fill  { height: 100%; background: var(--red); border-radius: 4px; transition: width 0.5s ease; }
+
+    /* Stage grid */
+    .stages-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .s-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+    .s-card.current { border-color: var(--red); box-shadow: 0 0 0 3px var(--red-light); }
+    .s-card.locked  { opacity: 0.5; }
+    .s-card.done    { border-color: var(--success); }
+    .s-card:not(.locked):hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+
+    .s-card .s-num  { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--charcoal-2); margin-bottom:0.25rem; }
+    .s-card .s-icon { font-size:2rem; display:block; margin-bottom:0.5rem; }
+    .s-card .s-name { font-family: var(--serif); font-size:1rem; font-weight:700; margin-bottom:0.35rem; }
+    .s-card .s-desc { font-size:0.78rem; color:var(--charcoal-2); line-height:1.5; margin-bottom:1rem; }
+    .s-card .s-badges { display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:1rem; }
+    .s-card .lock-overlay {
+      position: absolute;
+      bottom: 0.75rem;
+      right: 0.75rem;
+      font-size: 1.2rem;
+      opacity: 0.4;
+    }
+
+    /* Activity feed */
+    .activity-item {
+      display: flex;
+      gap: 0.85rem;
+      align-items: flex-start;
+      padding: 0.85rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .a-icon {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
+      background: var(--bg-2);
+    }
+    .a-text { flex: 1; }
+    .a-text strong { display: block; font-size: 0.875rem; font-weight: 600; }
+    .a-text span   { font-size: 0.78rem; color: var(--charcoal-2); }
+    .a-time { font-size: 0.72rem; color: var(--charcoal-2); white-space: nowrap; }
+
+    /* Club section */
+    .club-card {
+      background: linear-gradient(135deg, var(--charcoal), #1a1a1a);
+      border-radius: var(--r-lg);
+      padding: 1.75rem;
+      color: var(--white);
+      margin-bottom: 2rem;
+    }
+    .club-card h3 { color: #fff; margin-bottom:0.35rem; }
+    .club-card p  { color:rgba(255,255,255,0.65); font-size:0.85rem; margin-bottom:1rem; }
+    .club-tiers { display:flex; gap:0.5rem; flex-wrap:wrap; }
+    .club-tier {
+      padding: 0.3rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .ct-active  { background: var(--red); color: #fff; }
+    .ct-locked  { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); }
+
+    /* Quick stats */
+    .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:2rem; }
+    @media (max-width: 700px) { .stats-row { grid-template-columns:1fr 1fr; } }
+    .stat-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 1.25rem;
+      text-align: center;
+    }
+    .stat-card .sv { font-family:var(--serif); font-size:2rem; font-weight:700; color:var(--charcoal); }
+    .stat-card .sl { font-size:0.75rem; color:var(--charcoal-2); margin-top:0.2rem; }
+
+    /* Demo mode indicator */
+    .demo-bar {
+      background: var(--gold-light);
+      border-bottom: 1px solid #D4A83A;
+      padding: 0.5rem 2rem;
+      font-size: 0.78rem;
+      text-align: center;
+      color: #6B4F10;
+    }
+    .demo-bar a { color: var(--gold); font-weight: 700; }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="stella.html" class="nav-logo stella-logo">STELLA <span style="font-size:0.55em;vertical-align:super;">AI</span></a>
+    <ul class="nav-links">
+      <li><a href="dashboard.html" class="active" style="color:var(--stella);">Dashboard</a></li>
+      <li><a href="tutor.html">AI Tutor</a></li>
+      <li><a href="index.html">Euler100</a></li>
+    </ul>
+    <div class="nav-actions">
+      <span id="nav-alias" style="font-size:0.85rem;font-weight:600;color:var(--charcoal-2);"></span>
+      <a href="index.html" class="btn btn-ghost btn-sm">Sign Out</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Demo bar -->
+<div class="demo-bar">
+  🎮 <strong>Demo Mode</strong> — Simulated learner profile. Not registered yet? <a href="register.html">Go through the full registration flow →</a>
+</div>
+
+<div class="dashboard-layout">
+
+  <!-- Sidebar -->
+  <div class="dash-sidebar">
+    <div class="user-card">
+      <div class="user-avatar" id="sidebar-avatar">M</div>
+      <div class="user-alias" id="sidebar-alias">MathWizard42</div>
+      <div class="user-meta" id="sidebar-meta">Explorer · Switzerland</div>
+      <div class="user-stage">🧭 Stage 1: Explorer</div>
+    </div>
+
+    <div class="sidebar-section">Navigation</div>
+    <ul class="sidebar-nav">
+      <li><a href="dashboard.html" class="active"><span class="nav-icon">📊</span>My Dashboard</a></li>
+      <li><a href="tutor.html"><span class="nav-icon">🤖</span>AI Tutor</a></li>
+      <li><a href="#"><span class="nav-icon">📚</span>Practice Problems</a></li>
+      <li><a href="#"><span class="nav-icon">📈</span>My Progress</a></li>
+    </ul>
+    <div class="sidebar-section">Community</div>
+    <ul class="sidebar-nav">
+      <li><a href="#"><span class="nav-icon">🏫</span>My Class</a></li>
+      <li><a href="#"><span class="nav-icon">🌍</span>Country Board</a></li>
+      <li><a href="#"><span class="nav-icon">🌐</span>World Board</a></li>
+    </ul>
+    <div class="sidebar-section">Account</div>
+    <ul class="sidebar-nav">
+      <li><a href="#"><span class="nav-icon">👤</span>My Profile</a></li>
+      <li><a href="#"><span class="nav-icon">⚙️</span>Settings</a></li>
+      <li><a href="index.html"><span class="nav-icon">🏔</span>Euler100 Site</a></li>
+    </ul>
+  </div>
+
+  <!-- Main content -->
+  <div class="dash-main">
+
+    <!-- Header -->
+    <div class="dash-header">
+      <div>
+        <h2 id="welcome-msg">Welcome back, MathWizard42!</h2>
+        <p class="text-muted text-sm">Euler100 Qualifying Journey · Stage 1 of 7</p>
+      </div>
+      <a href="tutor.html" class="btn btn-primary">🤖 Start with AI Tutor →</a>
+    </div>
+
+    <!-- Quick stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="sv">1</div>
+        <div class="sl">Current Stage</div>
+      </div>
+      <div class="stat-card">
+        <div class="sv" id="stat-stage">Explorer</div>
+        <div class="sl">Stage Name</div>
+      </div>
+      <div class="stat-card">
+        <div class="sv">0/5</div>
+        <div class="sl" id="stat-q">Stage 1 Questions</div>
+      </div>
+      <div class="stat-card">
+        <div class="sv">100</div>
+        <div class="sl">Finalists invited</div>
+      </div>
+    </div>
+
+    <!-- Progress overview -->
+    <div class="progress-overview">
+      <div class="po-stage">
+        <span>Current Progress</span>
+        <strong id="po-stagename">🧭 Stage 1: Explorer</strong>
+      </div>
+      <div class="po-bar">
+        <div class="label">
+          <span>Stage Completion</span>
+          <span id="po-pct">0%</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" id="po-fill" style="width:0%"></div>
+        </div>
+      </div>
+      <a href="tutor.html" class="btn btn-stella">Continue →</a>
+    </div>
+
+    <!-- Euler Club -->
+    <div class="club-card">
+      <h3>🏆 Euler Club</h3>
+      <p>Your community grows as you advance through the stages. Connect with fellow mathematicians — safely, under your Euler alias.</p>
+      <div class="club-tiers">
+        <span class="club-tier ct-active">🏫 Class (Active)</span>
+        <span class="club-tier ct-locked">🌍 Country (Stage 3+)</span>
+        <span class="club-tier ct-locked">🌐 Continent (Stage 5+)</span>
+        <span class="club-tier ct-locked">⭐ World (Stage 7)</span>
+      </div>
+    </div>
+
+    <!-- Stage Cards -->
+    <h3 class="mb-3" style="font-family:var(--serif);">Your 7 Stages to Genius</h3>
+    <div class="stages-grid" id="stages-grid">
+      <!-- Populated by JS -->
+    </div>
+
+    <!-- Activity Feed -->
+    <div class="card" style="margin-bottom:2rem;">
+      <h3 style="margin-bottom:1.25rem;font-family:var(--serif);">Recent Activity</h3>
+      <div class="activity-item">
+        <div class="a-icon" style="background:var(--success-bg);">✅</div>
+        <div class="a-text">
+          <strong>Account activated</strong>
+          <span>Parent consent confirmed · Welcome to Euler100!</span>
+        </div>
+        <div class="a-time">Just now</div>
+      </div>
+      <div class="activity-item">
+        <div class="a-icon" style="background:var(--stella-light);">🤖</div>
+        <div class="a-text">
+          <strong>STELLA AI Tutor ready</strong>
+          <span>Stage 1: Explorer — 5 questions await</span>
+        </div>
+        <div class="a-time">Just now</div>
+      </div>
+      <div class="activity-item">
+        <div class="a-icon" style="background:var(--gold-light);">🏆</div>
+        <div class="a-text">
+          <strong>Joined Euler Club</strong>
+          <span>Class-level community access granted</span>
+        </div>
+        <div class="a-time">Just now</div>
+      </div>
+      <div id="activity-stage2" style="display:none;">
+        <div class="activity-item">
+          <div class="a-icon" style="background:var(--success-bg);">🧭</div>
+          <div class="a-text">
+            <strong>Stage 1: Explorer — COMPLETED!</strong>
+            <span>4/5 questions correct · You've advanced to Discoverer!</span>
+          </div>
+          <div class="a-time">Recently</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Your Profile -->
+    <div class="card">
+      <h3 style="margin-bottom:1.25rem;font-family:var(--serif);">My Profile</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div>
+          <div style="font-size:0.75rem;color:var(--charcoal-2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.25rem;">Euler Alias</div>
+          <div style="font-weight:700;color:var(--charcoal);" id="profile-alias">—</div>
+        </div>
+        <div>
+          <div style="font-size:0.75rem;color:var(--charcoal-2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.25rem;">Country</div>
+          <div style="font-weight:700;color:var(--charcoal);" id="profile-country">—</div>
+        </div>
+        <div>
+          <div style="font-size:0.75rem;color:var(--charcoal-2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.25rem;">School</div>
+          <div style="font-weight:700;color:var(--charcoal);" id="profile-school">—</div>
+        </div>
+        <div>
+          <div style="font-size:0.75rem;color:var(--charcoal-2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.25rem;">Teacher</div>
+          <div style="font-weight:700;color:var(--charcoal);" id="profile-teacher">—</div>
+        </div>
+        <div>
+          <div style="font-size:0.75rem;color:var(--charcoal-2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.25rem;">Consent Status</div>
+          <div style="color:var(--success);font-weight:700;">✅ Parent Approved</div>
+        </div>
+        <div>
+          <div style="font-size:0.75rem;color:var(--charcoal-2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.25rem;">Euler Club ID</div>
+          <div style="font-weight:700;font-family:monospace;color:var(--charcoal);" id="profile-clubid">—</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const stageData = [
+    { num:1, icon:'🧭', name:'Explorer',           desc:'Algebra fundamentals, geometry, fractions.',          free:true,  color:'#4A9D5A' },
+    { num:2, icon:'🔍', name:'Discoverer',          desc:'Number theory, ratios, probability basics.',          free:true,  color:'#6DB340' },
+    { num:3, icon:'🗺️', name:'Pathfinder',          desc:'Equations, data handling, 3D geometry.',             free:true,  color:'#E5A800' },
+    { num:4, icon:'📚', name:'Scholar',              desc:'Advanced algebra, sequences, proof by induction.',    free:false, color:'#E07A20' },
+    { num:5, icon:'🎓', name:'Cum Laude',            desc:'Competition mathematics, combinatorics, number theory.', free:false, color:'#D04040' },
+    { num:6, icon:'🏅', name:'Summa Cum Laude',      desc:'Pre-olympiad level problems, mathematical reasoning.',free:false, color:'#CC1A1A' },
+    { num:7, icon:'⭐', name:'Genius',               desc:'Top 100 worldwide. Invitation to Disentis, Oct 2027.',free:false, color:'#A07820', isGenius:true },
+  ];
+
+  function loadDashboard() {
+    const alias   = localStorage.getItem('e100_alias')   || 'MathWizard42';
+    const name    = localStorage.getItem('e100_name')    || 'Learner';
+    const school  = localStorage.getItem('e100_school')  || 'International School';
+    const country = localStorage.getItem('e100_country') || 'Switzerland 🇨🇭';
+    const teacher = localStorage.getItem('e100_teacher') || 'Ms. Rossi';
+    const stage   = parseInt(localStorage.getItem('e100_stage') || '1');
+    const s1done  = localStorage.getItem('e100_stage1_done') === 'yes';
+    const s1score = localStorage.getItem('e100_stage1_score') || '0';
+
+    // Nav & header
+    document.getElementById('nav-alias').textContent = alias;
+    document.getElementById('welcome-msg').textContent = 'Welcome back, ' + alias + '!';
+    document.getElementById('sidebar-alias').textContent = alias;
+    document.getElementById('sidebar-avatar').textContent = alias[0].toUpperCase();
+    document.getElementById('sidebar-meta').textContent = stageData[stage-1].name + ' · ' + country;
+
+    // Profile
+    document.getElementById('profile-alias').textContent   = alias;
+    document.getElementById('profile-country').textContent = country;
+    document.getElementById('profile-school').textContent  = school;
+    document.getElementById('profile-teacher').textContent = teacher;
+    document.getElementById('profile-clubid').textContent  = 'E100-' + alias.toUpperCase().substring(0,4) + '-' + Math.floor(Math.random()*9000+1000);
+
+    // Stats
+    const curStage = stageData[stage-1];
+    document.getElementById('stat-stage').textContent = curStage.name;
+    document.getElementById('po-stagename').textContent = curStage.icon + ' Stage ' + stage + ': ' + curStage.name;
+
+    if (s1done) {
+      const score = parseInt(s1score);
+      const pct = Math.round((score / 5) * 100);
+      document.getElementById('stat-q').textContent = 'Stage 1 Complete ✓';
+      document.getElementById('po-pct').textContent = pct + '%';
+      setTimeout(() => { document.getElementById('po-fill').style.width = pct + '%'; }, 100);
+      document.getElementById('activity-stage2').style.display = 'block';
+    } else {
+      document.getElementById('po-pct').textContent = '0%';
+      document.getElementById('po-fill').style.width = '0%';
+    }
+
+    // Build stage cards
+    const grid = document.getElementById('stages-grid');
+    grid.innerHTML = '';
+    stageData.forEach((s, i) => {
+      const sNum = i + 1;
+      const isDone    = s1done && sNum === 1;
+      const isCurrent = sNum === stage && !isDone;
+      const isLocked  = sNum > stage;
+
+      let statusClass = '';
+      if (isDone)    statusClass = 'done';
+      else if (isCurrent) statusClass = 'current';
+      else if (isLocked)  statusClass = 'locked';
+
+      let badgeHtml = '';
+      if (s.free) {
+        badgeHtml += '<span class="badge badge-free">FREE</span>';
+      } else {
+        badgeHtml += '<span class="badge badge-paid">$10 unlock</span>';
+      }
+      if (isDone)    badgeHtml += ' <span class="badge badge-done">✓ Complete</span>';
+      if (isCurrent) badgeHtml += ' <span class="badge badge-active">▶ Active</span>';
+
+      let actionHtml = '';
+      if (isDone) {
+        actionHtml = '<div style="color:var(--success);font-size:0.82rem;font-weight:700;">✓ Stage Complete!</div>';
+      } else if (isCurrent) {
+        actionHtml = '<a href="tutor.html" class="btn btn-stella btn-sm btn-full">Start with STELLA →</a>';
+      } else if (isLocked) {
+        actionHtml = '<div style="color:var(--locked);font-size:0.8rem;">Complete Stage ' + (sNum-1) + ' to unlock</div>';
+      }
+
+      const cardStyle = s.isGenius
+        ? 'background:linear-gradient(135deg,#3A3A3A,#1a1a1a);'
+        : '';
+
+      const nameStyle = s.isGenius ? 'color:var(--gold);' : '';
+
+      grid.innerHTML += `
+        <div class="s-card ${statusClass}" style="${cardStyle}border-top:4px solid ${s.color};">
+          <div class="s-num" style="${s.isGenius?'color:rgba(255,255,255,0.4);':''}">Stage ${sNum}</div>
+          <div class="s-icon">${s.icon}</div>
+          <div class="s-name" style="${nameStyle}">${s.name}</div>
+          <div class="s-desc" style="${s.isGenius?'color:rgba(255,255,255,0.6);':''}">${s.desc}</div>
+          <div class="s-badges">${badgeHtml}</div>
+          ${actionHtml}
+          ${isLocked ? '<div class="lock-overlay">🔒</div>' : ''}
+        </div>
+      `;
+    });
+  }
+
+  loadDashboard();
+
+  // Animate progress bar on load
+  window.addEventListener('load', () => {
+    const s1done = localStorage.getItem('e100_stage1_done') === 'yes';
+    const score  = parseInt(localStorage.getItem('e100_stage1_score') || '0');
+    if (s1done) {
+      setTimeout(() => {
+        document.getElementById('po-fill').style.width = Math.round((score/5)*100) + '%';
+      }, 300);
+    }
+  });
+</script>
+</body>
+</html>
