@@ -186,7 +186,15 @@
     <div class="step-panel active" id="step1">
       <span class="eyebrow stella">Step 1 of 4</span>
       <h2>Your Euler Profile</h2>
-      <p class="text-muted mt-1 mb-4">Tell us a bit about yourself. All under-13 participants need parent or teacher consent before their account activates.</p>
+      <p class="text-muted mt-1 mb-3">Tell us a bit about yourself. All under-13 participants need parent or teacher consent before their account activates.</p>
+
+      <!-- Demo quick-fill button -->
+      <div style="margin-bottom:1.5rem;padding:0.85rem 1.1rem;background:var(--gold-light);border:1px solid #D4B055;border-radius:var(--r);display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+        <span style="font-size:0.82rem;color:#6B4F10;">🎮 <strong>Demo mode:</strong> Auto-fill with sample learner data</span>
+        <button class="btn btn-gold btn-sm" onclick="demoFill()">Auto-fill →</button>
+      </div>
+
+      <div id="step1-alert" style="display:none;margin-bottom:1rem;padding:0.85rem 1.1rem;background:var(--red-light);border:1px solid var(--red);border-radius:var(--r);font-size:0.875rem;color:var(--red-dark);"></div>
 
       <div class="form-row">
         <div class="form-group">
@@ -202,8 +210,8 @@
       <div class="form-row">
         <div class="form-group">
           <label>Date of Birth <span class="req">*</span></label>
-          <input type="date" id="f_dob" max="2018-12-31" min="2015-01-01">
-          <div class="field-hint">Must be under 13 by 31 Dec 2027 (born 2015 or later)</div>
+          <input type="date" id="f_dob">
+          <div class="field-hint">Must be under 13 by 31 Dec 2027</div>
         </div>
         <div class="form-group">
           <label>Country <span class="req">*</span></label>
@@ -250,7 +258,6 @@
       </div>
 
       <button class="btn btn-stella btn-lg btn-full" onclick="goToStep2()">Continue to Step 2 →</button>
-      <div class="field-error show" id="step1-error" style="margin-top:0.75rem;display:none;"></div>
     </div>
 
     <!-- ===== STEP 2: Teacher ===== -->
@@ -483,6 +490,16 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  function demoFill() {
+    document.getElementById('f_fname').value = 'Hansie';
+    document.getElementById('f_lname').value = 'Slim';
+    document.getElementById('f_dob').value = '2016-03-15';
+    document.getElementById('f_country').value = 'South Africa 🇿🇦';
+    document.getElementById('f_school').value = 'Hoërskool Brackenfell';
+    document.getElementById('f_alias').value = 'Slimmie123';
+    updateAliasPreview();
+  }
+
   function goToStep2() {
     const fname = document.getElementById('f_fname').value.trim();
     const lname = document.getElementById('f_lname').value.trim();
@@ -490,15 +507,15 @@
     const country = document.getElementById('f_country').value;
     const school  = document.getElementById('f_school').value.trim();
     const alias   = document.getElementById('f_alias').value.trim();
-    const errEl   = document.getElementById('step1-error');
+    const alertEl = document.getElementById('step1-alert');
 
-    if (!fname || !lname) { showErr(errEl, 'Please enter your first and last name.'); return; }
-    if (!dob)             { showErr(errEl, 'Please enter your date of birth.'); return; }
-    if (!country)         { showErr(errEl, 'Please select your country.'); return; }
-    if (!school)          { showErr(errEl, 'Please enter your school name.'); return; }
-    if (alias.length < 4 || alias.includes(' ')) { showErr(errEl, 'Alias must be 4–20 characters with no spaces.'); return; }
+    alertEl.style.display = 'none';
 
-    errEl.style.display = 'none';
+    if (!fname || !lname) { showAlert(alertEl, '⚠️ Please enter your first and last name.'); return; }
+    if (!dob)             { showAlert(alertEl, '⚠️ Please enter your date of birth.'); return; }
+    if (!country)         { showAlert(alertEl, '⚠️ Please select your country.'); return; }
+    if (!school)          { showAlert(alertEl, '⚠️ Please enter your school name.'); return; }
+    if (alias.length < 4 || alias.includes(' ')) { showAlert(alertEl, '⚠️ Your Euler Alias must be 4–20 characters with no spaces.'); return; }
     studentAlias = alias;
     // Save to localStorage for other pages
     localStorage.setItem('e100_alias', alias);
@@ -539,6 +556,12 @@
     document.getElementById('welcome-alias-display').textContent = studentAlias || localStorage.getItem('e100_alias') || 'MathWizard42';
     goToStep(4);
     setProgress(4);
+  }
+
+  function showAlert(el, msg) {
+    el.textContent = msg;
+    el.style.display = 'block';
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   function showErr(el, msg) {
