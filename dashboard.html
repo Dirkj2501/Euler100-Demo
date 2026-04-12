@@ -317,7 +317,7 @@
     </div>
 
     <!-- Stage Cards -->
-    <h3 class="mb-3" style="font-family:var(--serif);">Your 7 Stages to Genius</h3>
+    <h3 class="mb-3" style="font-family:var(--serif);">Your 7 Stages to Genius 🧭 → ⛰️ → 🧗 → ✈️ → 🚀 → ♟️ → ⭐</h3>
     <div class="stages-grid" id="stages-grid">
       <!-- Populated by JS -->
     </div>
@@ -337,7 +337,7 @@
         <div class="a-icon" style="background:var(--stella-light);">🤖</div>
         <div class="a-text">
           <strong>STELLA AI Tutor ready</strong>
-          <span>Stage 1: Explorer — 5 questions await</span>
+          <span>Stage 1: Explorer — 5 questions await!</span>
         </div>
         <div class="a-time">Just now</div>
       </div>
@@ -407,13 +407,13 @@
 
 <script>
   const stageData = [
-    { num:1, icon:'🧭', name:'Explorer',           desc:'Algebra fundamentals, geometry, fractions.',               free:true,  color:'#4A9D5A' },
-    { num:2, icon:'🔍', name:'Discoverer',          desc:'Number theory, HCF, probability, ratio & circles.',        free:true,  color:'#6DB340' },
-    { num:3, icon:'🗺️', name:'Pathfinder',          desc:'Equations, data handling, 3D geometry.',                  free:true,  color:'#E5A800' },
-    { num:4, icon:'📚', name:'Scholar',              desc:'Advanced algebra, sequences, proof by induction.',         free:false, color:'#E07A20' },
-    { num:5, icon:'🎓', name:'Cum Laude',            desc:'Competition mathematics, combinatorics, number theory.',   free:false, color:'#D04040' },
-    { num:6, icon:'🏅', name:'Summa Cum Laude',      desc:'Pre-olympiad level problems, mathematical reasoning.',     free:false, color:'#CC1A1A' },
-    { num:7, icon:'⭐', name:'Genius',               desc:'Top 100 worldwide. Invitation to Disentis, Oct 2027.',    free:false, color:'#A07820', isGenius:true },
+    { num:1, icon:'🧭', name:'Explorer',    tier:'Pre-Academy',   desc:'Curiosity and discovery — algebra, geometry and fractions.',              free:true,  color:'#4A9D5A' },
+    { num:2, icon:'⛰️', name:'Adventurer',  tier:'Pre-Academy',   desc:'Taking on challenges — number theory, probability, ratio & circles.',     free:true,  color:'#6DB340' },
+    { num:3, icon:'🧗', name:'Alpinist',    tier:'Pre-Academy',   desc:'Mastery of difficulty — equations, data handling, 3D geometry.',          free:true,  color:'#E5A800' },
+    { num:4, icon:'✈️', name:'Aviator',     tier:'Euler Academy', desc:'Precision and control — advanced algebra, sequences, proof.',             free:false, color:'#E07A20' },
+    { num:5, icon:'🚀', name:'Astronaut',   tier:'Euler Academy', desc:'Rare, globally exceptional — competition maths, combinatorics.',          free:false, color:'#D04040' },
+    { num:6, icon:'♟️', name:'Grandmaster', tier:'Euler Academy', desc:'Strategic and intellectual dominance — pre-olympiad, mathematical proof.',free:false, color:'#CC1A1A' },
+    { num:7, icon:'⭐', name:'Genius',      tier:'Euler Academy', desc:'World-class distinction — Top 100 worldwide. Disentis, Oct 2027.',        free:false, color:'#A07820', isGenius:true },
   ];
 
   function loadDashboard() {
@@ -474,13 +474,13 @@
     // ── Activity feed ──────────────────────────────────────
     if (s1done) {
       document.getElementById('activity-stage1-done').style.display = 'block';
-      document.getElementById('act1-title').textContent = 'Stage 1: Explorer — COMPLETED!';
-      document.getElementById('act1-sub').textContent   = s1score + '/5 correct · Advanced to Discoverer!';
+      document.getElementById('act1-title').textContent = 'Stage 1: ' + stageData[0].name + ' — COMPLETED!';
+      document.getElementById('act1-sub').textContent   = s1score + '/5 correct · Advanced to ' + stageData[1].name + '!';
     }
     if (s2done) {
       document.getElementById('activity-stage2-done').style.display = 'block';
-      document.getElementById('act2-title').textContent = 'Stage 2: Discoverer — COMPLETED!';
-      document.getElementById('act2-sub').textContent   = s2score + '/5 correct · Advanced to Pathfinder!';
+      document.getElementById('act2-title').textContent = 'Stage 2: ' + stageData[1].name + ' — COMPLETED!';
+      document.getElementById('act2-sub').textContent   = s2score + '/5 correct · Advanced to ' + stageData[2].name + '!';
     }
 
     // ── Club tiers ────────────────────────────────────────
@@ -518,8 +518,8 @@
       else if (isLocked)  statusClass = 'locked';
 
       var badgeHtml = '';
-      if (s.free) badgeHtml += '<span class="badge badge-free">FREE</span>';
-      else        badgeHtml += '<span class="badge badge-paid">Qualifying stage</span>';
+      if (s.free) badgeHtml += '<span class="badge badge-free">Pre-Academy</span>';
+      else        badgeHtml += '<span class="badge badge-paid">Euler Academy</span>';
       if (isDone)    badgeHtml += ' <span class="badge badge-done">✓ Complete</span>';
       if (isCurrent) badgeHtml += ' <span class="badge badge-active">▶ Active</span>';
 
