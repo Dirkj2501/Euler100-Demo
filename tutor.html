@@ -363,7 +363,7 @@
 <script>
 /* =====================================================
    STELLA AI Tutor — Stage-aware (Euler100)
-   Supports Stage 1 (Explorer) and Stage 2 (Discoverer)
+   Supports Stage 1 (Explorer) and Stage 2 (Adventurer)
    Shows "coming soon" for Stage 3+
    ===================================================== */
 
@@ -375,8 +375,8 @@ const STAGES = {
     emoji: '🧭',
     grade: 'Grade 7 Mathematics · 5 Questions',
     nextNum: 2,
-    nextName: 'Discoverer',
-    nextEmoji: '🔍',
+    nextName: 'Adventurer',
+    nextEmoji: '⛰️',
     storeKey: 'e100_stage1_done',
     scoreKey: 'e100_stage1_score',
     topics: ['📐 Algebra', '📏 Geometry', '🔢 Fractions', '📊 Percentages', '🚂 Speed & Distance'],
@@ -438,12 +438,12 @@ const STAGES = {
 
   2: {
     num: 2,
-    name: 'Discoverer',
-    emoji: '🔍',
+    name: 'Adventurer',
+    emoji: '⛰️',
     grade: 'Grade 7–8 Mathematics · 5 Questions',
     nextNum: 3,
-    nextName: 'Pathfinder',
-    nextEmoji: '🗺️',
+    nextName: 'Alpinist',
+    nextEmoji: '🧗',
     storeKey: 'e100_stage2_done',
     scoreKey: 'e100_stage2_score',
     topics: ['🔢 HCF & LCM', '📐 Algebra', '⭕ Circles', '🎲 Probability', '⚖️ Ratio'],
@@ -510,7 +510,7 @@ const currentStage = parseInt(localStorage.getItem('e100_stage') || '1', 10);
 const sd           = STAGES[currentStage]; // may be undefined for stage 3+
 
 // ── Populate left panel ───────────────────────────────
-const stageName  = sd ? sd.name  : (['','','','Pathfinder','Scholar','Cum Laude','Summa Cum Laude','Genius'][currentStage] || 'Advanced');
+const stageName  = sd ? sd.name  : (['','','','Alpinist','Aviator','Astronaut','Grandmaster','Genius'][currentStage] || 'Advanced');
 const stageEmoji = sd ? sd.emoji : '🗺️';
 
 document.getElementById('nav-user').textContent = alias + ' · Stage ' + currentStage + ': ' + stageName;
@@ -546,7 +546,7 @@ if (!sd) {
   document.getElementById('chat-header-sub').innerHTML = '<span style="color:var(--charcoal-2);">Stage ' + currentStage + ': ' + stageName + ' — Coming Soon</span>';
 
   const prevStage = currentStage - 1;
-  const prevName  = ['','Explorer','Discoverer','Pathfinder','Scholar','Cum Laude','Summa Cum Laude'][prevStage] || 'previous stage';
+  const prevName  = ['','Explorer','Adventurer','Alpinist','Aviator','Astronaut','Grandmaster'][prevStage] || 'previous stage';
   document.getElementById('cs-icon').textContent  = stageEmoji;
   document.getElementById('cs-badge').textContent = 'Stage ' + currentStage + ': ' + stageName;
   document.getElementById('cs-text').textContent  =

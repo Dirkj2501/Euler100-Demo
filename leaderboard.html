@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Euler100 Leaderboard — Live World Rankings</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ── Page Layout ── */
+    .lb-hero {
+      background: linear-gradient(135deg, #1a0808 0%, #2a1200 50%, #3A3A3A 100%);
+      padding: 2.5rem 2rem 2rem;
+      text-align: center;
+      color: var(--white);
+      border-bottom: 3px solid var(--gold);
+    }
+    .lb-hero .eyebrow { color: var(--gold); font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; }
+    .lb-hero h1 { font-family: var(--serif); font-size: 2.2rem; color: #fff; margin: 0.4rem 0 0.5rem; }
+    .lb-hero p  { color: rgba(255,255,255,0.6); font-size: 0.9rem; }
+    .last-updated { display:inline-block; margin-top:0.75rem; padding:0.25rem 0.75rem; background:rgba(255,255,255,0.08); border-radius:20px; font-size:0.72rem; color:rgba(255,255,255,0.45); }
+
+    /* ── Global stats row ── */
+    .lb-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+    }
+    @media(max-width:700px){ .lb-stats { grid-template-columns: 1fr 1fr; } }
+    .lb-stat {
+      padding: 1.25rem;
+      text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .lb-stat:last-child { border-right: none; }
+    .lb-stat .val { font-family: var(--serif); font-size: 2rem; font-weight: 700; color: var(--charcoal); }
+    .lb-stat .lbl { font-size: 0.72rem; color: var(--charcoal-2); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.2rem; }
+
+    /* ── Tabs ── */
+    .lb-tabs {
+      display: flex;
+      gap: 0;
+      background: var(--white);
+      border-bottom: 2px solid var(--border);
+      overflow-x: auto;
+    }
+    .lb-tab {
+      padding: 1rem 1.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--charcoal-2);
+      cursor: pointer;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.15s;
+      background: none;
+      border-top: none; border-left: none; border-right: none;
+    }
+    .lb-tab:hover { color: var(--charcoal); }
+    .lb-tab.active { color: var(--red); border-bottom-color: var(--red); }
+
+    /* ── Content area ── */
+    .lb-content { background: var(--bg-2); min-height: 60vh; padding: 1.5rem 2rem; }
+    @media(max-width:768px){ .lb-content { padding: 1rem; } }
+
+    /* ── Table ── */
+    .lb-table-wrap { background: var(--white); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; overflow-x: auto; }
+    table.lb-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    table.lb-table th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--charcoal-2);
+      background: var(--bg-2);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    table.lb-table td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    table.lb-table tr:last-child td { border-bottom: none; }
+    table.lb-table tr:hover td { background: var(--bg-2); }
+    table.lb-table tr.you-row td { background: rgba(204,26,26,0.05); }
+    table.lb-table tr.you-row:hover td { background: rgba(204,26,26,0.09); }
+
+    .rank-cell { font-family: var(--serif); font-size: 1.1rem; font-weight: 700; color: var(--charcoal-2); width: 52px; text-align: center; }
+    .rank-medal { font-size: 1.3rem; }
+
+    .alias-cell { font-weight: 700; color: var(--charcoal); }
+    .you-pill { display:inline-block; margin-left:0.5rem; padding:0.1rem 0.45rem; background:var(--red); color:#fff; border-radius:10px; font-size:0.6rem; font-weight:700; vertical-align:middle; }
+
+    .country-cell { display:flex; align-items:center; gap:0.4rem; }
+    .cflag { font-size:1.1rem; }
+
+    .stage-cell { display:flex; align-items:center; gap:0.5rem; }
+    .stage-icon-sm { font-size:1rem; }
+    .tier-pill {
+      display:inline-block;
+      padding:0.12rem 0.45rem;
+      border-radius:10px;
+      font-size:0.6rem;
+      font-weight:700;
+    }
+    .tier-pre  { background:rgba(74,157,90,0.15);  color:#2a7a3a; }
+    .tier-acad { background:rgba(204,26,26,0.12);  color:#a01010; }
+
+    .tests-cell { font-size:0.8rem; color:var(--charcoal-2); }
+    .tests-bar { width:60px; height:4px; background:var(--border); border-radius:2px; margin-top:3px; overflow:hidden; }
+    .tests-fill { height:100%; background:var(--stella); border-radius:2px; }
+
+    .fa-cell { font-size:0.85rem; font-weight:600; }
+    .fa-good { color:var(--success); }
+    .fa-mid  { color:#E07A20; }
+    .fa-low  { color:var(--red); }
+
+    .ei-cell { display:flex; align-items:center; gap:0.6rem; }
+    .ei-num { font-family:var(--serif); font-size:1.15rem; font-weight:700; min-width:42px; text-align:right; }
+    .ei-bar-track { width:70px; height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
+    .ei-bar-fill  { height:100%; border-radius:3px; }
+    .ei-genius     { color:#A07820; }
+    .ei-grandmaster{ color:#CC1A1A; }
+    .ei-astronaut  { color:#D04040; }
+    .ei-aviator    { color:#E07A20; }
+    .ei-alpinist   { color:#E5A800; }
+    .ei-adventurer { color:#6DB340; }
+    .ei-explorer   { color:#4A9D5A; }
+
+    /* ── Continent sections ── */
+    .continent-section { margin-bottom: 2rem; }
+    .continent-header {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: var(--charcoal);
+      color: #fff;
+      border-radius: var(--r-lg) var(--r-lg) 0 0;
+      font-family: var(--serif);
+      font-size: 1rem;
+      font-weight: 700;
+    }
+    .continent-header .ci-count { margin-left:auto; font-size:0.72rem; font-weight:400; color:rgba(255,255,255,0.5); }
+
+    /* ── Country filter ── */
+    .country-filter {
+      display: flex; gap: 1rem; align-items: center;
+      padding: 1rem; background: var(--white);
+      border: 1px solid var(--border); border-radius: var(--r-lg);
+      margin-bottom: 1.25rem;
+    }
+    .country-filter label { font-size:0.85rem; font-weight:600; white-space:nowrap; }
+    .country-filter select {
+      flex:1; padding:0.5rem 0.75rem;
+      border:1.5px solid var(--border); border-radius:var(--r);
+      font-family:var(--sans); font-size:0.875rem;
+      background:var(--bg-2); color:var(--charcoal);
+    }
+    .country-filter select:focus { outline:none; border-color:var(--red); }
+
+    /* ── Top 100 Race ── */
+    .race-intro {
+      background: linear-gradient(135deg, #1a0808, #3A1A00);
+      border-radius: var(--r-lg);
+      padding: 1.25rem 1.5rem;
+      color: var(--white);
+      margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .race-intro h3 { color: var(--gold); font-family: var(--serif); font-size: 1.15rem; margin-bottom: 0.25rem; }
+    .race-intro p  { color: rgba(255,255,255,0.65); font-size: 0.82rem; }
+    .race-counts { display:flex; gap:1.5rem; margin-left:auto; }
+    .rc-item { text-align:center; }
+    .rc-num  { font-family:var(--serif); font-size:1.6rem; font-weight:700; color:var(--gold); display:block; }
+    .rc-lbl  { font-size:0.65rem; text-transform:uppercase; letter-spacing:0.08em; color:rgba(255,255,255,0.4); }
+
+    .race-row {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      transition: box-shadow 0.15s;
+    }
+    .race-row:hover { box-shadow: var(--shadow); }
+    .race-row.you-row { border-color: var(--red); box-shadow: 0 0 0 2px rgba(204,26,26,0.2); }
+    .race-row.top3 { border-color: var(--gold); background: linear-gradient(to right, rgba(160,120,32,0.05), var(--white)); }
+
+    .rr-rank { font-family:var(--serif); font-size:1.6rem; font-weight:700; color:var(--charcoal-2); min-width:50px; text-align:center; flex-shrink:0; }
+    .rr-rank.gold   { color:#C8960C; }
+    .rr-rank.silver { color:#8A8A8A; }
+    .rr-rank.bronze { color:#A0522D; }
+
+    .rr-info { flex:1; min-width:0; }
+    .rr-alias { font-weight:700; font-size:0.95rem; color:var(--charcoal); }
+    .rr-meta  { font-size:0.75rem; color:var(--charcoal-2); margin-top:0.15rem; }
+
+    .rr-stages { flex:2; min-width:0; }
+    .stage-bar {
+      display: flex; gap: 3px; height: 18px; align-items: center;
+    }
+    .sb-seg {
+      flex: 1;
+      height: 100%;
+      border-radius: 3px;
+      position: relative;
+      overflow: hidden;
+      background: var(--border);
+    }
+    .sb-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+    .sb-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 0.55rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.8);
+      pointer-events: none;
+    }
+
+    .rr-ei { text-align:right; flex-shrink:0; }
+    .rr-ei-num { font-family:var(--serif); font-size:1.5rem; font-weight:700; }
+    .rr-ei-lbl { font-size:0.65rem; color:var(--charcoal-2); text-align:right; }
+
+    /* ── Methodology ── */
+    .methodology {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      margin: 2rem 2rem 0;
+      overflow: hidden;
+    }
+    .method-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.25rem 1.5rem;
+      cursor: pointer;
+      background: var(--bg-2);
+      border-bottom: 1px solid var(--border);
+    }
+    .method-header h3 { font-family: var(--serif); font-size: 1rem; }
+    .method-header .toggle-icon { font-size: 1.2rem; color: var(--charcoal-2); transition: transform 0.2s; }
+    .method-body { display: none; padding: 1.5rem 2rem; }
+    .method-body.open { display: block; }
+
+    .formula-box {
+      background: linear-gradient(135deg, #1a0808, #2a1200);
+      border-radius: var(--r-lg);
+      padding: 1.5rem;
+      margin: 1.25rem 0;
+      color: var(--white);
+      text-align: center;
+    }
+    .formula-box .formula { font-family: var(--serif); font-size: 1.5rem; color: var(--gold); margin: 0.5rem 0; }
+    .formula-box .formula-sub { font-size: 0.8rem; color: rgba(255,255,255,0.55); }
+
+    .comp-table { width:100%; border-collapse:collapse; font-size:0.8rem; margin:1rem 0; }
+    .comp-table th { background:var(--bg-2); padding:0.6rem 0.8rem; text-align:left; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--charcoal-2); border-bottom:1px solid var(--border); }
+    .comp-table td { padding:0.65rem 0.8rem; border-bottom:1px solid var(--border); vertical-align:top; }
+    .comp-table tr:last-child td { border-bottom:none; }
+    .comp-table .pre-row td { background:rgba(74,157,90,0.05); }
+    .comp-table .acad-row td { background:rgba(204,26,26,0.04); }
+
+    .integrity-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    @media(max-width:600px){ .integrity-grid { grid-template-columns:1fr; } }
+    .integrity-item {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1rem;
+    }
+    .integrity-item strong { display:block; margin-bottom:0.25rem; font-size:0.875rem; }
+    .integrity-item p { font-size:0.78rem; color:var(--charcoal-2); line-height:1.55; }
+
+    /* ── Footer ── */
+    .lb-footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.78rem;
+      color: var(--charcoal-2);
+      border-top: 1px solid var(--border);
+      margin-top: 2rem;
+    }
+    .lb-footer a { color: var(--red); }
+
+    /* ── Section title ── */
+    .section-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--charcoal-2);
+      margin-bottom: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">euler<span>100</span></a>
+    <ul class="nav-links">
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="leaderboard.html" class="active" style="color:var(--red);">Leaderboard</a></li>
+      <li><a href="tutor.html">AI Tutor</a></li>
+      <li><a href="index.html">euler.swiss</a></li>
+    </ul>
+    <div class="nav-actions">
+      <span id="nav-alias" style="font-size:0.85rem;font-weight:600;color:var(--charcoal-2);"></span>
+      <a href="dashboard.html" class="btn btn-ghost btn-sm">← Dashboard</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Demo bar -->
+<div style="background:var(--gold-light);border-bottom:1px solid #D4A83A;padding:0.5rem 2rem;font-size:0.78rem;text-align:center;color:#6B4F10;">
+  🎮 <strong>Demo Mode</strong> — Rankings shown are simulated. In production, rankings update in real time as candidates complete assessments.
+</div>
+
+<!-- Hero -->
+<div class="lb-hero">
+  <div class="eyebrow">Euler100 · World Junior Mathematics Challenge</div>
+  <h1>🏆 Live World Rankings</h1>
+  <p>Global, continental, and country rankings updated after every completed assessment</p>
+  <span class="last-updated" id="last-updated">Last updated: Loading…</span>
+</div>
+
+<!-- Global stats -->
+<div class="lb-stats">
+  <div class="lb-stat">
+    <div class="val" id="stat-total">—</div>
+    <div class="lbl">Registered Candidates</div>
+  </div>
+  <div class="lb-stat">
+    <div class="val" id="stat-countries">—</div>
+    <div class="lbl">Countries Represented</div>
+  </div>
+  <div class="lb-stat">
+    <div class="val" id="stat-genius">—</div>
+    <div class="lbl">Genius Level Reached</div>
+  </div>
+  <div class="lb-stat">
+    <div class="val" id="stat-spots">100</div>
+    <div class="lbl">Disentis Finalist Spots</div>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="lb-tabs">
+  <button class="lb-tab active" onclick="switchTab('global',this)">🌐 Global Rankings</button>
+  <button class="lb-tab" onclick="switchTab('continental',this)">🗺️ By Continent</button>
+  <button class="lb-tab" onclick="switchTab('country',this)">🏳 By Country</button>
+  <button class="lb-tab" onclick="switchTab('race',this)">⭐ Top 100 Race</button>
+</div>
+
+<!-- Content -->
+<div class="lb-content" id="lb-content">
+  <!-- Rendered by JS -->
+</div>
+
+<!-- Methodology (collapsible) -->
+<div class="methodology">
+  <div class="method-header" onclick="toggleMethod(this)">
+    <h3>📐 Euler Index (EI) — How Rankings Are Calculated</h3>
+    <span class="toggle-icon" id="method-icon">▼</span>
+  </div>
+  <div class="method-body" id="method-body">
+
+    <p style="color:var(--charcoal-2);font-size:0.875rem;line-height:1.7;max-width:700px;">The <strong>Euler Index (EI)</strong> is a composite score from <strong>0 to 1000</strong> designed to reward genuine mathematical mastery. It has three components that together ensure rankings reflect both breadth of achievement and depth of understanding.</p>
+
+    <div class="formula-box">
+      <div class="formula-sub">EULER INDEX FORMULA</div>
+      <div class="formula">EI = J + P + R &nbsp;&nbsp; (max 1000)</div>
+      <div class="formula-sub" style="margin-top:0.5rem;">J = Journey Score (max 500) &nbsp;|&nbsp; P = Precision Score (max 350) &nbsp;|&nbsp; R = Resilience Score (max 150)</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin:1.25rem 0;">
+      <div class="card" style="border-top:4px solid #4A9D5A;">
+        <div style="font-size:1.5rem;margin-bottom:0.35rem;">🗺️</div>
+        <strong>Journey Score (J)</strong>
+        <div style="font-size:1.1rem;font-weight:700;color:#4A9D5A;margin:0.3rem 0;">max 500 pts</div>
+        <div style="font-size:0.78rem;color:var(--charcoal-2);line-height:1.55;">
+          <strong>J = (Tests Passed ÷ 49) × 500</strong><br><br>
+          Measures progress through all 7 stages. Each stage has 7 tests of 10 questions. You must score 7/10 or above to pass a test and unlock the next one.
+        </div>
+      </div>
+      <div class="card" style="border-top:4px solid var(--stella);">
+        <div style="font-size:1.5rem;margin-bottom:0.35rem;">🎯</div>
+        <strong>Precision Score (P)</strong>
+        <div style="font-size:1.1rem;font-weight:700;color:var(--stella);margin:0.3rem 0;">max 350 pts</div>
+        <div style="font-size:0.78rem;color:var(--charcoal-2);line-height:1.55;">
+          <strong>P = First-Attempt Accuracy × 350</strong><br><br>
+          The share of all questions you answered correctly on your very first attempt. Rewards true mastery — knowing the answer, not learning it under exam pressure.
+        </div>
+      </div>
+      <div class="card" style="border-top:4px solid var(--gold);">
+        <div style="font-size:1.5rem;margin-bottom:0.35rem;">💪</div>
+        <strong>Resilience Score (R)</strong>
+        <div style="font-size:1.1rem;font-weight:700;color:var(--gold);margin:0.3rem 0;">max 150 pts</div>
+        <div style="font-size:0.78rem;color:var(--charcoal-2);line-height:1.55;">
+          <strong>R = Second-Attempt Recovery Rate × 150</strong><br><br>
+          Of the questions you got wrong first time, how many did you get right on your second attempt? Rewards learning from mistakes during the assessment.
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;margin:1.25rem 0;">
+      <strong style="font-size:0.875rem;">📊 Worked Example</strong>
+      <p style="font-size:0.82rem;color:var(--charcoal-2);margin:0.5rem 0 0;">Suppose a candidate has completed 35 tests (all of stages 1–5), with 85% first-attempt accuracy and 70% second-attempt recovery:</p>
+      <div style="font-family:monospace;font-size:0.82rem;margin:0.75rem 0;padding:0.75rem;background:var(--white);border-radius:var(--r);">
+        J = (35 ÷ 49) × 500 = <strong>357</strong><br>
+        P = 0.85 × 350 = <strong>297</strong><br>
+        R = 0.70 × 150 = <strong>105</strong><br>
+        <span style="color:var(--red);font-weight:700;">EI = 357 + 297 + 105 = 759</span>
+      </div>
+      <p style="font-size:0.78rem;color:var(--charcoal-2);">Note: A candidate at a lower stage with exceptional accuracy can outrank a candidate at a higher stage with poor precision. This is intentional — the EI rewards mastery, not just advancement speed.</p>
+    </div>
+
+    <h4 style="font-family:var(--serif);margin:1.5rem 0 0.75rem;">Stage Difficulty Standards</h4>
+    <p style="font-size:0.82rem;color:var(--charcoal-2);margin-bottom:1rem;">Each stage's question difficulty is calibrated against internationally recognised junior mathematics competition standards:</p>
+
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Stage</th>
+          <th>Level Name</th>
+          <th>Tier</th>
+          <th>Tests</th>
+          <th>Equivalent Competition Standard</th>
+          <th>Key Topics</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="pre-row">
+          <td><strong>1</strong></td>
+          <td>🧭 Explorer</td>
+          <td><span class="tier-pill tier-pre">Pre-Academy</span></td>
+          <td>7 × 10 Q</td>
+          <td>AMC 8 / UKMT Junior Mathematical Challenge (foundations)</td>
+          <td>Arithmetic, fractions, basic algebra, 2D geometry, ratios, percentages, speed</td>
+        </tr>
+        <tr class="pre-row">
+          <td><strong>2</strong></td>
+          <td>⛰️ Adventurer</td>
+          <td><span class="tier-pill tier-pre">Pre-Academy</span></td>
+          <td>7 × 10 Q</td>
+          <td>High-end AMC 8 / UKMT JMC (upper range)</td>
+          <td>HCF/LCM, expanding brackets, probability, coordinate geometry, data handling</td>
+        </tr>
+        <tr class="pre-row">
+          <td><strong>3</strong></td>
+          <td>🧗 Alpinist</td>
+          <td><span class="tier-pill tier-pre">Pre-Academy</span></td>
+          <td>7 × 10 Q</td>
+          <td>UKMT JMC top band / Low AMC 10 (transition to proof thinking)</td>
+          <td>Simultaneous equations, quadratics, 3D geometry, Pythagoras, sequences, intro proof</td>
+        </tr>
+        <tr class="acad-row">
+          <td><strong>4</strong></td>
+          <td>✈️ Aviator</td>
+          <td><span class="tier-pill tier-acad">Euler Academy</span></td>
+          <td>7 × 10 Q</td>
+          <td>AMC 10 / UKMT Junior Mathematical Olympiad</td>
+          <td>Advanced algebra, trigonometry, combinatorics intro, modular arithmetic, inequalities</td>
+        </tr>
+        <tr class="acad-row">
+          <td><strong>5</strong></td>
+          <td>🚀 Astronaut</td>
+          <td><span class="tier-pill tier-acad">Euler Academy</span></td>
+          <td>7 × 10 Q</td>
+          <td>AMC 12 / AIME foundation / UKMT Intermediate Olympiad</td>
+          <td>Polynomial theory, advanced combinatorics, series, competition geometry, expected value</td>
+        </tr>
+        <tr class="acad-row">
+          <td><strong>6</strong></td>
+          <td>♟️ Grandmaster</td>
+          <td><span class="tier-pill tier-acad">Euler Academy</span></td>
+          <td>7 × 10 Q</td>
+          <td>AIME / USA(J)MO (national elite level)</td>
+          <td>Functional equations, advanced number theory, olympiad geometry, proof writing</td>
+        </tr>
+        <tr class="acad-row">
+          <td><strong>7</strong></td>
+          <td>⭐ Genius</td>
+          <td><span class="tier-pill tier-acad">Euler Academy</span></td>
+          <td>7 × 10 Q</td>
+          <td>IMO Shortlist / IMO level (world-class)</td>
+          <td>Diophantine equations, projective geometry, advanced combinatorics, open proof problems</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4 style="font-family:var(--serif);margin:1.5rem 0 0.75rem;">🛡️ Integrity &amp; Anti-Gaming Provisions</h4>
+    <div class="integrity-grid">
+      <div class="integrity-item">
+        <strong>One Account Per Candidate</strong>
+        <p>Registration requires verified parent or teacher consent. Duplicate accounts are detected through cross-referencing of consent records and permanently disqualified.</p>
+      </div>
+      <div class="integrity-item">
+        <strong>Randomised Question Pools</strong>
+        <p>Each stage contains a large pool of questions. Tests draw randomly and present questions in random order — memorising answers from previous attempts provides no advantage.</p>
+      </div>
+      <div class="integrity-item">
+        <strong>Response Pattern Analysis</strong>
+        <p>STELLA AI monitors session timing and answer patterns. Unusually fast correct responses, irregular switching between attempts, and other anomalies are flagged for human review.</p>
+      </div>
+      <div class="integrity-item">
+        <strong>Mastery Cannot Be Faked</strong>
+        <p>The Precision Score (P) component rewards genuine first-attempt knowledge. Racing through stages with poor accuracy yields a low EI — only true understanding produces a high ranking.</p>
+      </div>
+      <div class="integrity-item">
+        <strong>School &amp; Teacher Accountability</strong>
+        <p>Candidates enrolled via teacher class code are accountable through their school. Teachers are notified of any integrity concerns and may be required to supervise assessments.</p>
+      </div>
+      <div class="integrity-item">
+        <strong>Disentis Finale Verification</strong>
+        <p>All Top 100 finalists must pass an in-person verification assessment at Kloster Disentis. Only candidates who can demonstrate their Euler Index performance live are confirmed as finalists.</p>
+      </div>
+    </div>
+
+    <p style="font-size:0.75rem;color:var(--charcoal-2);margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);">
+      The Euler Index formula, stage difficulty calibration, and integrity provisions are reviewed annually by the Euler100 Academic Committee. Full methodology documentation is available in the <a href="#" style="color:var(--red);">Euler100 Terms &amp; Conditions</a>. Competition standards are benchmarked against AMC (Mathematical Association of America), UKMT (United Kingdom Mathematics Trust), and IMO (International Mathematical Olympiad) public guidelines.
+    </p>
+  </div>
+</div>
+
+<div class="lb-footer">
+  <p>🏔 Euler100 — World Junior Mathematics Challenge · Finale: Kloster Disentis, Switzerland · October 2027</p>
+  <p style="margin-top:0.4rem;"><a href="index.html">euler.swiss</a> &nbsp;·&nbsp; <a href="stella.html">STELLA AI</a> &nbsp;·&nbsp; <a href="dashboard.html">My Dashboard</a> &nbsp;·&nbsp; <a href="#">Terms &amp; Conditions</a></p>
+</div>
+
+<script>
+/* =====================================================
+   Euler100 Leaderboard — Live World Rankings
+   Euler Index (EI) formula: EI = J + P + R (max 1000)
+   J = (testsCompleted/49)*500  — Journey
+   P = firstAttemptRate * 350   — Precision
+   R = secondAttemptRate * 150  — Resilience
+   ===================================================== */
+
+const STAGE_NAMES  = ['Explorer','Adventurer','Alpinist','Aviator','Astronaut','Grandmaster','Genius'];
+const STAGE_ICONS  = ['🧭','⛰️','🧗','✈️','🚀','♟️','⭐'];
+const STAGE_TIER   = ['Pre-Academy','Pre-Academy','Pre-Academy','Euler Academy','Euler Academy','Euler Academy','Euler Academy'];
+const STAGE_COLORS = ['#4A9D5A','#6DB340','#E5A800','#E07A20','#D04040','#CC1A1A','#A07820'];
+
+// EI colour thresholds
+function eiColor(ei) {
+  if (ei >= 900) return '#A07820';
+  if (ei >= 800) return '#CC1A1A';
+  if (ei >= 700) return '#D04040';
+  if (ei >= 600) return '#E07A20';
+  if (ei >= 500) return '#E5A800';
+  if (ei >= 400) return '#6DB340';
+  return '#4A9D5A';
+}
+
+function computeEI(tc, fa, sa) {
+  var J = (tc / 49) * 500;
+  var P = fa * 350;
+  var R = sa * 150;
+  return Math.floor(J + P + R);
+}
+
+// stageNum = current stage they are competing at (1-7)
+// tc = total tests completed out of 49
+// fa = first-attempt accuracy (0.0–1.0)
+// sa = second-attempt recovery rate (0.0–1.0)
+var DEMO_CANDIDATES = [
+  {alias:'MathEagle99',  country:'Singapore',    flag:'🇸🇬', continent:'Asia',      stageNum:7, tc:49, fa:0.92, sa:0.78},
+  {alias:'ProofQueen',   country:'India',        flag:'🇮🇳', continent:'Asia',      stageNum:7, tc:49, fa:0.85, sa:0.82},
+  {alias:'PiHunter',     country:'Germany',      flag:'🇩🇪', continent:'Europe',    stageNum:7, tc:47, fa:0.89, sa:0.71},
+  {alias:'AlphaZeta',    country:'Switzerland',  flag:'🇨🇭', continent:'Europe',    stageNum:6, tc:42, fa:0.91, sa:0.69},
+  {alias:'FractalKid',   country:'UK',           flag:'🇬🇧', continent:'Europe',    stageNum:6, tc:41, fa:0.88, sa:0.75},
+  {alias:'SetStar',      country:'Netherlands',  flag:'🇳🇱', continent:'Europe',    stageNum:6, tc:40, fa:0.84, sa:0.80},
+  {alias:'VectorVince',  country:'USA',          flag:'🇺🇸', continent:'Americas',  stageNum:6, tc:40, fa:0.86, sa:0.73},
+  {alias:'MatrixMaya',   country:'Japan',        flag:'🇯🇵', continent:'Asia',      stageNum:6, tc:39, fa:0.90, sa:0.62},
+  {alias:'LogicLion',    country:'South Africa', flag:'🇿🇦', continent:'Africa',    stageNum:6, tc:38, fa:0.87, sa:0.74},
+  {alias:'TangentTom',   country:'France',       flag:'🇫🇷', continent:'Europe',    stageNum:5, tc:35, fa:0.91, sa:0.72},
+  {alias:'CurveChamp',   country:'Canada',       flag:'🇨🇦', continent:'Americas',  stageNum:6, tc:37, fa:0.85, sa:0.70},
+  {alias:'PrimePulse',   country:'Australia',    flag:'🇦🇺', continent:'Oceania',   stageNum:6, tc:36, fa:0.88, sa:0.65},
+  {alias:'SigmaStorm',   country:'Brazil',       flag:'🇧🇷', continent:'Americas',  stageNum:5, tc:33, fa:0.84, sa:0.68},
+  {alias:'OmegaOlga',    country:'Germany',      flag:'🇩🇪', continent:'Europe',    stageNum:5, tc:31, fa:0.86, sa:0.75},
+  {alias:'RadiusRaj',    country:'India',        flag:'🇮🇳', continent:'Asia',      stageNum:5, tc:32, fa:0.89, sa:0.61},
+  {alias:'VortexVi',     country:'Singapore',    flag:'🇸🇬', continent:'Asia',      stageNum:4, tc:28, fa:0.92, sa:0.76},
+  {alias:'EulerErin',    country:'Switzerland',  flag:'🇨🇭', continent:'Europe',    stageNum:5, tc:30, fa:0.83, sa:0.70},
+  {alias:'DiamondDex',   country:'Kenya',        flag:'🇰🇪', continent:'Africa',    stageNum:5, tc:29, fa:0.87, sa:0.63},
+  {alias:'QuotientQ',    country:'UK',           flag:'🇬🇧', continent:'Europe',    stageNum:4, tc:26, fa:0.85, sa:0.68},
+  {alias:'NeutronNova',  country:'USA',          flag:'🇺🇸', continent:'Americas',  stageNum:4, tc:25, fa:0.83, sa:0.72},
+  {alias:'LemniscateLu', country:'China',        flag:'🇨🇳', continent:'Asia',      stageNum:4, tc:23, fa:0.89, sa:0.65},
+  {alias:'ZenithZoe',    country:'Australia',    flag:'🇦🇺', continent:'Oceania',   stageNum:3, tc:21, fa:0.90, sa:0.74},
+  {alias:'PeakPatrice',  country:'France',       flag:'🇫🇷', continent:'Europe',    stageNum:4, tc:24, fa:0.87, sa:0.60},
+  {alias:'HelixHans',    country:'Germany',      flag:'🇩🇪', continent:'Europe',    stageNum:4, tc:22, fa:0.86, sa:0.71},
+  {alias:'NumeraNour',   country:'Nigeria',      flag:'🇳🇬', continent:'Africa',    stageNum:3, tc:20, fa:0.88, sa:0.69},
+  {alias:'QuantumQua',   country:'Brazil',       flag:'🇧🇷', continent:'Americas',  stageNum:3, tc:19, fa:0.83, sa:0.65},
+  {alias:'ApexAnna',     country:'Netherlands',  flag:'🇳🇱', continent:'Europe',    stageNum:3, tc:18, fa:0.85, sa:0.62},
+  {alias:'ThetaTibo',    country:'Switzerland',  flag:'🇨🇭', continent:'Europe',    stageNum:2, tc:14, fa:0.87, sa:0.70},
+  {alias:'BinaryBea',    country:'Canada',       flag:'🇨🇦', continent:'Americas',  stageNum:2, tc:12, fa:0.86, sa:0.72},
+  {alias:'SolverSam',    country:'South Africa', flag:'🇿🇦', continent:'Africa',    stageNum:2, tc:13, fa:0.84, sa:0.68},
+  {alias:'CipherCara',   country:'Kenya',        flag:'🇰🇪', continent:'Africa',    stageNum:1, tc:7,  fa:0.82, sa:0.74},
+  {alias:'LatticeKai',   country:'New Zealand',  flag:'🇳🇿', continent:'Oceania',   stageNum:1, tc:6,  fa:0.88, sa:0.65},
+];
+
+// Compute EI for all demo candidates
+DEMO_CANDIDATES.forEach(function(c) { c.ei = computeEI(c.tc, c.fa, c.sa); c.isYou = false; });
+
+// ── Inject current user from localStorage ────────────────
+function buildUserCandidate() {
+  var alias   = localStorage.getItem('e100_alias')   || null;
+  if (!alias) return null;
+  var stage   = Math.min(parseInt(localStorage.getItem('e100_stage') || '1'), 7);
+  var country = localStorage.getItem('e100_country') || 'Unknown';
+  var s1done  = localStorage.getItem('e100_stage1_done') === 'yes';
+  var s2done  = localStorage.getItem('e100_stage2_done') === 'yes';
+  var s1score = parseInt(localStorage.getItem('e100_stage1_score') || '0');
+  var s2score = parseInt(localStorage.getItem('e100_stage2_score') || '0');
+
+  // Estimate tests completed
+  var completedStages = stage - 1;
+  var testsInCurrentStage = s2done ? 7 : (s1done ? 5 : 3);
+  var tc = Math.min(completedStages * 7 + testsInCurrentStage, 49);
+
+  // Estimate FA from actual scores
+  var lastScore = s2done ? s2score : (s1done ? s1score : 3);
+  var fa = Math.max(lastScore / 5 * 0.85 + 0.05, 0.45);
+  var sa = 0.62;
+
+  return {
+    alias: alias,
+    country: country.replace(/\s*🇿🇦|🇨🇭|🇺🇸|🇬🇧|🇩🇪|🇫🇷|🇮🇳|🇦🇺/g, '').trim() || country,
+    flag: '📍',
+    continent: 'Your Region',
+    stageNum: stage,
+    tc: tc,
+    fa: fa,
+    sa: sa,
+    ei: computeEI(tc, fa, sa),
+    isYou: true,
+  };
+}
+
+// Build full ranked list
+function buildRanked() {
+  var all = DEMO_CANDIDATES.slice();
+  var user = buildUserCandidate();
+  // Only add user if their alias isn't already in the demo list
+  if (user && !all.some(function(c){ return c.alias === user.alias; })) {
+    all.push(user);
+  }
+  all.sort(function(a,b){ return b.ei - a.ei; });
+  all.forEach(function(c,i){ c.rank = i+1; });
+  return all;
+}
+
+var RANKED = buildRanked();
+
+// ── Update header stats ──────────────────────────────────
+(function() {
+  document.getElementById('nav-alias').textContent = localStorage.getItem('e100_alias') || '';
+  document.getElementById('stat-total').textContent = (RANKED.length + 847).toLocaleString();
+  var countries = new Set(RANKED.map(function(c){ return c.country; }));
+  document.getElementById('stat-countries').textContent = countries.size + '+';
+  var geniusCount = RANKED.filter(function(c){ return c.stageNum === 7; }).length;
+  document.getElementById('stat-genius').textContent = geniusCount;
+  var now = new Date();
+  document.getElementById('last-updated').textContent = 'Last updated: ' + now.toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'}) + ' ' + now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+})();
+
+// ── Render helpers ────────────────────────────────────────
+function stageLabel(c) {
+  var sn = Math.max(0, Math.min(c.stageNum-1, 6));
+  return STAGE_ICONS[sn] + ' ' + STAGE_NAMES[sn];
+}
+function stageTier(c) {
+  var sn = Math.max(0, Math.min(c.stageNum-1, 6));
+  var tier = STAGE_TIER[sn];
+  var cls  = tier === 'Pre-Academy' ? 'tier-pre' : 'tier-acad';
+  return '<span class="tier-pill ' + cls + '">' + tier + '</span>';
+}
+function rankIcon(r) {
+  if (r === 1) return '<span class="rank-medal">🥇</span>';
+  if (r === 2) return '<span class="rank-medal">🥈</span>';
+  if (r === 3) return '<span class="rank-medal">🥉</span>';
+  return '<span style="font-family:var(--serif);font-size:0.95rem;color:var(--charcoal-2);">' + r + '</span>';
+}
+function faPct(fa) {
+  var p = Math.round(fa * 100);
+  var cls = p >= 85 ? 'fa-good' : p >= 70 ? 'fa-mid' : 'fa-low';
+  return '<span class="' + cls + '">' + p + '%</span>';
+}
+function eiCell(c) {
+  var col = eiColor(c.ei);
+  var pct = Math.round(c.ei / 10);
+  return '<div class="ei-cell"><div class="ei-num" style="color:' + col + ';">' + c.ei + '</div><div class="ei-bar-track"><div class="ei-bar-fill" style="width:' + pct + '%;background:' + col + ';"></div></div></div>';
+}
+
+function buildTableRow(c) {
+  var rowCls = c.isYou ? 'you-row' : '';
+  var youPill = c.isYou ? '<span class="you-pill">YOU</span>' : '';
+  var pct = Math.round((c.tc / 49) * 100);
+  return '<tr class="' + rowCls + '">'
+    + '<td class="rank-cell">' + rankIcon(c.rank) + '</td>'
+    + '<td><span class="alias-cell">' + c.alias + youPill + '</span></td>'
+    + '<td><div class="country-cell"><span class="cflag">' + c.flag + '</span><span>' + c.country + '</span></div></td>'
+    + '<td style="font-size:0.78rem;color:var(--charcoal-2);">' + c.continent + '</td>'
+    + '<td><div class="stage-cell">' + stageLabel(c) + stageTier(c) + '</div></td>'
+    + '<td class="tests-cell">' + c.tc + '/49<div class="tests-bar"><div class="tests-fill" style="width:' + pct + '%;"></div></div></td>'
+    + '<td>' + faPct(c.fa) + '</td>'
+    + '<td>' + eiCell(c) + '</td>'
+    + '</tr>';
+}
+
+function tableHeader() {
+  return '<table class="lb-table"><thead><tr>'
+    + '<th style="width:52px;">Rank</th><th>Alias</th><th>Country</th><th>Continent</th><th>Stage</th><th>Tests</th><th>FA %</th><th>Euler Index</th>'
+    + '</tr></thead><tbody>';
+}
+
+// ── View: Global ──────────────────────────────────────────
+function renderGlobal() {
+  var html = '<div class="section-title">Global Rankings — All ' + RANKED.length + ' Registered Candidates (Demo: ' + RANKED.length + ' shown)</div>';
+  html += '<div class="lb-table-wrap">' + tableHeader();
+  RANKED.forEach(function(c){ html += buildTableRow(c); });
+  html += '</tbody></table></div>';
+  document.getElementById('lb-content').innerHTML = html;
+}
+
+// ── View: Continental ─────────────────────────────────────
+function renderContinental() {
+  var continents = ['Asia','Europe','Africa','Americas','Oceania','Your Region'];
+  var icons = {'Asia':'🌏','Europe':'🌍','Africa':'🌍','Americas':'🌎','Oceania':'🌏','Your Region':'📍'};
+  var html = '';
+  continents.forEach(function(cont) {
+    var members = RANKED.filter(function(c){ return c.continent === cont; });
+    if (!members.length) return;
+    // Re-rank within continent
+    members.forEach(function(c,i){ c.contRank = i+1; });
+    html += '<div class="continent-section">';
+    html += '<div class="continent-header">' + (icons[cont]||'🌐') + ' ' + cont + '<span class="ci-count">' + members.length + ' candidate' + (members.length!==1?'s':'') + '</span></div>';
+    html += '<div class="lb-table-wrap" style="border-radius:0 0 var(--r-lg) var(--r-lg);">' + tableHeader();
+    members.forEach(function(c){
+      var saved = c.rank;
+      c.rank = c.contRank;
+      html += buildTableRow(c);
+      c.rank = saved;
+    });
+    html += '</tbody></table></div></div>';
+  });
+  document.getElementById('lb-content').innerHTML = html;
+}
+
+// ── View: By Country ──────────────────────────────────────
+function renderCountry(filterCountry) {
+  var allCountries = [];
+  RANKED.forEach(function(c){ if (allCountries.indexOf(c.country) === -1) allCountries.push(c.country); });
+  allCountries.sort();
+
+  var selectHtml = '<select id="country-select" onchange="renderCountry(this.value)">';
+  allCountries.forEach(function(co){
+    selectHtml += '<option value="' + co + '"' + (co === filterCountry ? ' selected' : '') + '>' + co + '</option>';
+  });
+  selectHtml += '</select>';
+
+  var html = '<div class="country-filter"><label>Select Country:</label>' + selectHtml + '</div>';
+
+  var members = RANKED.filter(function(c){ return c.country === filterCountry; });
+  if (members.length === 0) {
+    html += '<div style="text-align:center;padding:2rem;color:var(--charcoal-2);">No candidates found for this country yet.</div>';
+  } else {
+    members.forEach(function(c,i){ c.ctryRank = i+1; });
+    html += '<div class="section-title">' + (members[0].flag) + ' ' + filterCountry + ' Rankings — ' + members.length + ' candidate' + (members.length!==1?'s':'') + '</div>';
+    html += '<div class="lb-table-wrap">' + tableHeader();
+    members.forEach(function(c){
+      var saved = c.rank;
+      c.rank = c.ctryRank;
+      html += buildTableRow(c);
+      c.rank = saved;
+    });
+    html += '</tbody></table></div>';
+  }
+  document.getElementById('lb-content').innerHTML = html;
+}
+
+// ── View: Top 100 Race ────────────────────────────────────
+function renderRace() {
+  var qualifiedCount = RANKED.length;
+  var slotsLeft = Math.max(100 - qualifiedCount, 0);
+
+  var html = '<div class="race-intro">'
+    + '<div><h3>⭐ The Race to Disentis</h3><p>The top 100 candidates by Euler Index earn a personal invitation to the Euler100 Finale at Kloster Disentis, Switzerland — October 2027. The race is on.</p></div>'
+    + '<div class="race-counts"><div class="rc-item"><span class="rc-num">' + qualifiedCount + '</span><span class="rc-lbl">In Race</span></div><div class="rc-item"><span class="rc-num" style="color:rgba(255,255,255,0.4);">' + slotsLeft + '</span><span class="rc-lbl">Slots Open</span></div></div>'
+    + '</div>';
+
+  html += '<div class="section-title">Current Top ' + Math.min(qualifiedCount, 100) + ' — Ranked by Euler Index (EI)</div>';
+
+  RANKED.slice(0, 100).forEach(function(c) {
+    var rankCls = c.rank === 1 ? 'top3 gold' : c.rank === 2 ? 'top3 silver' : c.rank === 3 ? 'top3 bronze' : '';
+    var rankNumCls = c.rank === 1 ? 'gold' : c.rank === 2 ? 'silver' : c.rank === 3 ? 'bronze' : '';
+    var rowCls = (c.isYou ? 'you-row ' : '') + rankCls;
+    var youPill = c.isYou ? ' <span class="you-pill">YOU</span>' : '';
+
+    // Build 7-segment stage bar
+    var barSegs = '';
+    for (var seg = 1; seg <= 7; seg++) {
+      var fillPct = 0;
+      if (seg < c.stageNum) {
+        fillPct = 100;
+      } else if (seg === c.stageNum) {
+        var testsInThisStage = c.tc - (c.stageNum - 1) * 7;
+        fillPct = Math.min(Math.max(testsInThisStage / 7 * 100, 0), 100);
+      }
+      var color = STAGE_COLORS[seg - 1];
+      barSegs += '<div class="sb-seg" title="Stage ' + seg + ': ' + STAGE_NAMES[seg-1] + '">'
+        + '<div class="sb-fill" style="width:' + fillPct + '%;background:' + color + ';"></div>'
+        + '</div>';
+    }
+
+    var sn = Math.max(0, Math.min(c.stageNum-1, 6));
+    var col = eiColor(c.ei);
+    html += '<div class="race-row ' + rowCls + '">'
+      + '<div class="rr-rank ' + rankNumCls + '">' + c.rank + '</div>'
+      + '<div class="rr-info"><div class="rr-alias">' + c.alias + youPill + '</div><div class="rr-meta">' + c.flag + ' ' + c.country + ' &nbsp;·&nbsp; ' + (STAGE_ICONS[sn]) + ' ' + STAGE_NAMES[sn] + ' &nbsp;·&nbsp; ' + c.tc + '/49 tests</div></div>'
+      + '<div class="rr-stages"><div class="stage-bar">' + barSegs + '</div><div style="display:flex;justify-content:space-between;margin-top:2px;">' + STAGE_NAMES.map(function(n,i){ return '<div style="font-size:0.5rem;color:var(--charcoal-2);flex:1;text-align:center;overflow:hidden;">' + STAGE_ICONS[i] + '</div>'; }).join('') + '</div></div>'
+      + '<div class="rr-ei"><div class="rr-ei-num" style="color:' + col + ';">' + c.ei + '</div><div class="rr-ei-lbl">Euler Index</div></div>'
+      + '</div>';
+  });
+
+  // Remaining open slots (if fewer than 100 qualified)
+  if (qualifiedCount < 100) {
+    html += '<div style="text-align:center;padding:1.5rem;background:var(--white);border:1px dashed var(--border);border-radius:var(--r-lg);margin-top:0.75rem;color:var(--charcoal-2);">'
+      + '<div style="font-size:1.5rem;margin-bottom:0.5rem;">🔒</div>'
+      + '<strong>Spots ' + (qualifiedCount+1) + '–100 still available</strong>'
+      + '<p style="font-size:0.82rem;margin-top:0.25rem;">Register and advance through the stages to claim your place in Disentis.</p>'
+      + '<a href="register.html" class="btn btn-primary" style="margin-top:0.75rem;">Start Your Journey →</a>'
+      + '</div>';
+  }
+
+  document.getElementById('lb-content').innerHTML = html;
+}
+
+// ── Tab switching ─────────────────────────────────────────
+var currentTab = 'global';
+function switchTab(tab, btn) {
+  currentTab = tab;
+  document.querySelectorAll('.lb-tab').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+
+  if (tab === 'global') renderGlobal();
+  else if (tab === 'continental') renderContinental();
+  else if (tab === 'country') {
+    var userCountry = RANKED.find(function(c){ return c.isYou; });
+    var defaultCountry = userCountry ? userCountry.country : RANKED[0].country;
+    renderCountry(defaultCountry);
+  }
+  else if (tab === 'race') renderRace();
+}
+
+// Country filter change (delegated via inline onchange)
+window.renderCountry = renderCountry;
+
+// ── Methodology toggle ────────────────────────────────────
+window.toggleMethod = function(header) {
+  var body = document.getElementById('method-body');
+  var icon = document.getElementById('method-icon');
+  body.classList.toggle('open');
+  icon.textContent = body.classList.contains('open') ? '▲' : '▼';
+};
+
+// ── Init ──────────────────────────────────────────────────
+renderGlobal();
+</script>
+
+</body>
+</html>
